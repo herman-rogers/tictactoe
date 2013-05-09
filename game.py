@@ -6,8 +6,8 @@ WINDOWHEIGHT = 480
 BOARDWIDTH = 3
 BOARDHEIGHT = 3
 BOXSIZE = 130
-CIRCLESIZE = 100
-SQUARESIZE = 100
+CIRCLESIZE = 60
+XSIZE = 60
 
 #Color Index -- Changing these values changes the colors
 #          R   G   B
@@ -22,16 +22,12 @@ BOARDCOLOR = WHITE
 TILECOLOR = BLACK
 CIRCLECOLOR = WHITE
 
-
-XSHAPE = 'xshape'
-CIRCLE = 'circle'
-
 XMARGIN = int((WINDOWWIDTH - (BOXSIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (BOXSIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
 
 def load_png(name):
     """This is so we can load objects relative paths"""
-    fullname = os.path.join('/data', name)
+    fullname = os.path.join('data/images', name)
     try:
         image = pygame.image.load(fullname)
         if image.get_alpha() is None:
@@ -54,7 +50,7 @@ def mainGame():
         SURFACE = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
         gamestate = 1
         mainBoard = generateNewBoard(80)
-        penguine_image = ("penguine.png") 
+        penguine_image = load_png("penguine.png") 
 
 ########This is the Main loop###########
         while gamestate == 1:
@@ -64,8 +60,7 @@ def mainGame():
 
 
                 if event.type == MOUSEBUTTONDOWN:
-                    drawBoard(mainBoard)
-                    playerCircle() 
+                    playerCircle(mainBoard) 
                #     if (spotx, spoty) == (None, None):
                #         if RESET_RECT.collidepoint(event.pos):
                #             drawBoard(mainBoard)
@@ -80,10 +75,33 @@ def mainGame():
             pygame.display.update()
         gameExit()
 
-def playerCircle():
-    mousex, mousey = 200, 200
-    pygame.draw.circle(SURFACE, CIRCLECOLOR, (mousex, mousey), 50)
 
+#####THis Draws the Circle for Player 1
+
+def playerCircle(board):
+
+    posx, posy = pygame.mouse.get_pos()
+
+    for tileX in range(len(board)):
+        for tileY in range(len(board[0])):
+            left, top = getLeftTopCoords(tileX, tileY) #This is the Coordinates from Top Left
+            tileRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE) #This is finding the Board Size
+            if tileRect.collidepoint(posx, posy):
+                return drawPlayerCircle()
+
+##STOP: TRYING TO FIGURE OUT HOW TO CENTER CIRCLES
+
+def drawPlayerCircle():
+    
+    posx, posy = pygame.mouse.get_pos()
+    pygame.draw.circle(SURFACE, CIRCLECOLOR, (posx, posy), CIRCLESIZE)
+
+    #penguine_image = load_png("penguine.png")
+
+def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
+
+    left, top = getLeftTopCoords(tilex, tiley,) 
+    pygame.draw.rect(SURFACE, TILECOLOR, (left + adjx, top + adjy, BOXSIZE, BOXSIZE))
 
 def gameExit():
     pygame.quit()
@@ -105,19 +123,14 @@ def getMouseClick(board, x, y):
     return (None,None)
 
 def getLeftTopCoords(tileX, tileY):
+
     left = XMARGIN + (tileX * BOXSIZE) + (tileX - 1)
     top = YMARGIN + (tileY * BOXSIZE) + (tileY - 1)
     return (left, top)
-
-def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
-    left, top = getLeftTopCoords(tilex, tiley,) 
-    pygame.draw.rect(SURFACE, TILECOLOR, (left + adjx, top + adjy, BOXSIZE, BOXSIZE))
- 
-##CURRENT FUNCTION WORKING ON
  
 def drawBoard(board): 
-    SURFACE.fill(BACKCOLOR) 
-    
+
+    SURFACE.fill(BACKCOLOR)     
     left, top = getLeftTopCoords(0,0)
     width = BOARDWIDTH * BOXSIZE
     height = BOARDHEIGHT * BOXSIZE
@@ -129,6 +142,7 @@ def drawBoard(board):
                 drawSquare(tilex, tiley, board[tilex][tiley])
 
 def getStartBoard():
+    
     counter = 1
     board = []
     for x in range(BOARDWIDTH):
@@ -145,32 +159,6 @@ def generateNewBoard(self):
     drawBoard(board)
     pygame.display.update()
     return (board)
-
-#Drawing GameShapes
-
-#def drawCircleAtPixel(shape, color, tileX, tileY):
-#    for tilex in range(BOARDWIDTH):
-#        for tileY in range(BOARDHEIGHT):
-#            left, top = getLeftTopCoords(tileX,tileY)
-#            playerCircle = pygame.Circle(left, top, CIRCLESIZE, CIRCLESIZE)
-#            if boxCircle.collidepoint(x,y):
-#                return(tileX, tileY)
-#    return(None, None)
-#
-#
-#def drawShapes(color, tileX, tileY):
-#    quarter = int(BOXSIZE * 0.25)
-#    half = int(BOXSIZE * 0.5)
-#
-#    left, top = getLeftTopCoords(tileX, tileY)
-#
-#    if shape == CIRCLE:
-#    pygame.draw.circle(SURFACE, CIRCLECOLOR, (left + half, top + half), half - 5)
-#    pygame.draw.circle(SURFACE, BOARDCOLOR, (left + half, top + half), quarter - 5)
-#    elif shape == SQUARE:
-#        pygame.draw.rect(SURFACE, CIRCLECOLOR, (left + quarter, top + quarter, BOXSIZE - half, BOXSIZE - half))
-
-
 
 ##################STARTING FUNCTION###################
 
