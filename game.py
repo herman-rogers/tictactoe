@@ -1,5 +1,5 @@
-import pygame, sys, os, random
-from pygame.locals import* #not sure if we will need this
+import pygame, sys, os, random, time
+from pygame.locals import*
 
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
@@ -7,7 +7,8 @@ BOARDWIDTH = 3
 BOARDHEIGHT = 3
 BOXSIZE = 130
 CIRCLESIZE = 60
-XSIZE = 60
+DONUTSIZE = 50
+XSIZE = 80
 
 #Color Index -- Changing these values changes the colors
 #          R   G   B
@@ -21,6 +22,7 @@ BACKCOLOR = DARKTURQUOISE
 BOARDCOLOR = WHITE
 TILECOLOR = BLACK
 CIRCLECOLOR = WHITE
+XCOLOR = WHITE
 
 XMARGIN = int((WINDOWWIDTH - (BOXSIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (BOXSIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
@@ -44,64 +46,73 @@ def mainGame():
         global FPSCLOCK, SURFACE, RESET_RECT
         pygame.init()
         pygame.display.set_caption('Tic-Tac-Toe')
+        turn = True
         mousex = 0
         mousey = 0
         FPSCLOCK = pygame.time.Clock()
         SURFACE = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
         gamestate = 1
-        mainBoard = generateNewBoard(80)
-        penguine_image = load_png("penguine.png") 
+        mainBoard = generateNewBoard(80) 
 
 ########This is the Main loop###########
         while gamestate == 1:
-            for event in pygame.event.get():
-                if event.type == MOUSEBUTTONUP:
-                    spotx, spoty = getMouseClick(mainBoard, event.pos[0], event.pos[1])
-                    playerOnex, playerOney = getPlayerPosition(mainBoard)
+            if turn == True:
+                for event in pygame.event.get():
+                    if event.type == MOUSEBUTTONUP:
+                        spotx, spoty = getMouseClick(mainBoard, event.pos[0], event.pos[1])
+                        playerOnex, playerOney = getPlayerPosition(mainBoard)
  
-                    if (spotx, spoty) == (playerOnex, playerOney): 
-                        posx, posy = playerOnex, playerOney
-                        drawCircle(posx, posy, 0,0)
+                        if (spotx, spoty) == (playerOnex, playerOney): 
+                            posx, posy = playerOnex, playerOney
+                            drawCircle(posx, posy, 0,0)
+                          #  turn = 'computer'
                 
-                    else:
-                        #This finds players mouse position,
-                        # anchors itself to board position 5, then adjusts according to mouse location
+                        else:
+                            #This finds players mouse position,
+                            # anchors itself to board position 5, then adjusts according to mouse location
                         
-                        if spotx == playerOnex + 1 and spoty == playerOney:
-                            posx, posy = playerOnex + 1, playerOney
-                            drawCircle(posx, posy, 0,0)
+                            if spotx == playerOnex + 1 and spoty == playerOney:
+                                posx, posy = playerOnex + 1, playerOney
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
 
-                        elif spotx == playerOnex and spoty == playerOney + 1: 
-                            posx, posy = playerOnex, playerOney + 1
-                            drawCircle(posx, posy, 0,0)
-                      
-                        elif spotx == playerOnex and spoty == playerOney - 1: 
-                            posx, posy = playerOnex, playerOney - 1
-                            drawCircle(posx, posy, 0,0)
-                      
-                        elif spotx == playerOnex - 1 and spoty == playerOney: 
-                            posx, posy = playerOnex - 1, playerOney
-                            drawCircle(posx, posy, 0,0)
-                      
-                        elif spotx == playerOnex - 1 and spoty == playerOney + 1: 
-                            posx, posy = playerOnex - 1, playerOney + 1
-                            drawCircle(posx, posy, 0,0)
-                      
-                        elif spotx == playerOnex + 1 and spoty == playerOney + 1: 
-                            posx, posy = playerOnex + 1, playerOney + 1
-                            drawCircle(posx, posy, 0,0)
-                      
-                        elif spotx == playerOnex - 1 and spoty == playerOney - 1: 
-                            posx, posy = playerOnex - 1, playerOney - 1
-                            drawCircle(posx, posy, 0,0)
-                      
-                        elif spotx == playerOnex + 1 and spoty == playerOney - 1: 
-                            posx, posy = playerOnex + 1, playerOney - 1
-                            drawCircle(posx, posy, 0,0)
+                            elif spotx == playerOnex and spoty == playerOney + 1: 
+                                posx, posy = playerOnex, playerOney + 1
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
 
+                            elif spotx == playerOnex and spoty == playerOney - 1: 
+                                posx, posy = playerOnex, playerOney - 1
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
+ 
+                            elif spotx == playerOnex - 1 and spoty == playerOney: 
+                                posx, posy = playerOnex - 1, playerOney
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
+ 
+                            elif spotx == playerOnex - 1 and spoty == playerOney + 1: 
+                                posx, posy = playerOnex - 1, playerOney + 1
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
+ 
+                            elif spotx == playerOnex + 1 and spoty == playerOney + 1: 
+                                posx, posy = playerOnex + 1, playerOney + 1
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
+
+                            elif spotx == playerOnex - 1 and spoty == playerOney - 1: 
+                                posx, posy = playerOnex - 1, playerOney - 1
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
+
+                            elif spotx == playerOnex + 1 and spoty == playerOney - 1: 
+                                posx, posy = playerOnex + 1, playerOney - 1
+                                drawCircle(posx, posy, 0,0)
+                            #    turn = 'computer'
 
                 if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):    
-                    gamestate = 0 
+                    gamestate = 0
 
             pygame.display.update()
         gameExit()
@@ -110,9 +121,10 @@ def gameExit():
     pygame.quit()
     exit()
 
+def isValidMove(board):
+    pass
 
-
-#####THis Draws the Circle for Player 1
+##These Functions Draw the Player One Circle##
 
 def getPlayerPosition(board):
     #Find the position
@@ -125,17 +137,18 @@ def drawCircle(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley)
     centerleft, centertop = left + 65, top + 65 #to center circle divide BOXSIZE/2, then adjust both top and left
     pygame.draw.circle(SURFACE, CIRCLECOLOR, (centerleft + adjx, centertop + adjy), CIRCLESIZE)
+    pygame.draw.circle(SURFACE, TILECOLOR, (centerleft + adjx, centertop + adjy), DONUTSIZE) #this is the inside of the Circle
 
 def drawX(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley)
     centerleft, centertop = left + 65, top + 65
-    pygame.draw.circle(SURFACE, CIRCLECOLOR, (centerleft + adjx, centertop + adjy), CIRCLESIZE) #this is a place holder for now
+
 
 def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley,) 
     pygame.draw.rect(SURFACE, TILECOLOR, (left + adjx, top + adjy, BOXSIZE, BOXSIZE))
 
-
+##Main Functions that Find Mouse Position and Top/Left Coords Relative to Tile Square##
 def getMouseClick(board, x, y):
     for tileX in range(len(board)):
         for tileY in range(len(board[0])):
@@ -150,6 +163,8 @@ def getLeftTopCoords(tileX, tileY):
     left = XMARGIN + (tileX * BOXSIZE) + (tileX - 1)
     top = YMARGIN + (tileY * BOXSIZE) + (tileY - 1)
     return (left, top) 
+
+##These Functions Draw the Main Board##
 
 def drawBoard(board): 
 
