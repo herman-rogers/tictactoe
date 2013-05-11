@@ -57,61 +57,84 @@ def mainGame():
             for event in pygame.event.get():
                 if event.type == MOUSEBUTTONUP:
                     spotx, spoty = getMouseClick(mainBoard, event.pos[0], event.pos[1])
-
-
-                if event.type == MOUSEBUTTONDOWN:
-                    playerCircle(mainBoard) 
-               #     if (spotx, spoty) == (None, None):
-               #         if RESET_RECT.collidepoint(event.pos):
-               #             drawBoard(mainBoard)
-               #             allMoves = [] 
-               #     else:
-
-               #         blankx, blanky = getBlankCoords(mainBoard)
+                    playerOnex, playerOney = getPlayerPosition(mainBoard)
  
+                    if (spotx, spoty) == (playerOnex, playerOney): 
+                        posx, posy = playerOnex, playerOney
+                        drawCircle(posx, posy, 0,0)
+                
+                    else:
+                        #This finds players mouse position,
+                        # anchors itself to board position 5, then adjusts according to mouse location
+                        
+                        if spotx == playerOnex + 1 and spoty == playerOney:
+                            posx, posy = playerOnex + 1, playerOney
+                            drawCircle(posx, posy, 0,0)
+
+                        elif spotx == playerOnex and spoty == playerOney + 1: 
+                            posx, posy = playerOnex, playerOney + 1
+                            drawCircle(posx, posy, 0,0)
+                      
+                        elif spotx == playerOnex and spoty == playerOney - 1: 
+                            posx, posy = playerOnex, playerOney - 1
+                            drawCircle(posx, posy, 0,0)
+                      
+                        elif spotx == playerOnex - 1 and spoty == playerOney: 
+                            posx, posy = playerOnex - 1, playerOney
+                            drawCircle(posx, posy, 0,0)
+                      
+                        elif spotx == playerOnex - 1 and spoty == playerOney + 1: 
+                            posx, posy = playerOnex - 1, playerOney + 1
+                            drawCircle(posx, posy, 0,0)
+                      
+                        elif spotx == playerOnex + 1 and spoty == playerOney + 1: 
+                            posx, posy = playerOnex + 1, playerOney + 1
+                            drawCircle(posx, posy, 0,0)
+                      
+                        elif spotx == playerOnex - 1 and spoty == playerOney - 1: 
+                            posx, posy = playerOnex - 1, playerOney - 1
+                            drawCircle(posx, posy, 0,0)
+                      
+                        elif spotx == playerOnex + 1 and spoty == playerOney - 1: 
+                            posx, posy = playerOnex + 1, playerOney - 1
+                            drawCircle(posx, posy, 0,0)
+
+
                 if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):    
                     gamestate = 0 
 
             pygame.display.update()
         gameExit()
 
-
-#####THis Draws the Circle for Player 1
-
-def playerCircle(board):
-
-    posx, posy = pygame.mouse.get_pos()
-
-    for tileX in range(len(board)):
-        for tileY in range(len(board[0])):
-            left, top = getLeftTopCoords(tileX, tileY) #This is the Coordinates from Top Left
-            tileRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE) #This is finding the Board Size
-            if tileRect.collidepoint(posx, posy):
-                return drawPlayerCircle()
-
-##STOP: TRYING TO FIGURE OUT HOW TO CENTER CIRCLES
-
-def drawPlayerCircle():
-    
-    posx, posy = pygame.mouse.get_pos()
-    pygame.draw.circle(SURFACE, CIRCLECOLOR, (posx, posy), CIRCLESIZE)
-
-    #penguine_image = load_png("penguine.png")
-
-def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
-
-    left, top = getLeftTopCoords(tilex, tiley,) 
-    pygame.draw.rect(SURFACE, TILECOLOR, (left + adjx, top + adjy, BOXSIZE, BOXSIZE))
-
 def gameExit():
     pygame.quit()
     exit()
 
-def getBlankCoords(board):
+
+
+#####THis Draws the Circle for Player 1
+
+def getPlayerPosition(board):
+    #Find the position
     for x in range(BOARDWIDTH):
         for y in range(BOARDHEIGHT):
-            if board[x][y] == None:
+            if board[x][y] == 5:
                 return(x,y)
+
+def drawCircle(tilex, tiley, number, adjx = 0, adjy = 0):
+    left, top = getLeftTopCoords(tilex, tiley)
+    centerleft, centertop = left + 65, top + 65 #to center circle divide BOXSIZE/2, then adjust both top and left
+    pygame.draw.circle(SURFACE, CIRCLECOLOR, (centerleft + adjx, centertop + adjy), CIRCLESIZE)
+
+def drawX(tilex, tiley, number, adjx = 0, adjy = 0):
+    left, top = getLeftTopCoords(tilex, tiley)
+    centerleft, centertop = left + 65, top + 65
+    pygame.draw.circle(SURFACE, CIRCLECOLOR, (centerleft + adjx, centertop + adjy), CIRCLESIZE) #this is a place holder for now
+
+def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
+    left, top = getLeftTopCoords(tilex, tiley,) 
+    pygame.draw.rect(SURFACE, TILECOLOR, (left + adjx, top + adjy, BOXSIZE, BOXSIZE))
+
 
 def getMouseClick(board, x, y):
     for tileX in range(len(board)):
@@ -126,8 +149,8 @@ def getLeftTopCoords(tileX, tileY):
 
     left = XMARGIN + (tileX * BOXSIZE) + (tileX - 1)
     top = YMARGIN + (tileY * BOXSIZE) + (tileY - 1)
-    return (left, top)
- 
+    return (left, top) 
+
 def drawBoard(board): 
 
     SURFACE.fill(BACKCOLOR)     
@@ -142,7 +165,9 @@ def drawBoard(board):
                 drawSquare(tilex, tiley, board[tilex][tiley])
 
 def getStartBoard():
-    
+    #Returns Values for Board
+    #[1,4,7], [2,5,8],[3,6,9]
+ 
     counter = 1
     board = []
     for x in range(BOARDWIDTH):
