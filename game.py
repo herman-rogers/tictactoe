@@ -71,12 +71,11 @@ def mainGame():
                 while time.time() < pauseUntil:
                     pygame.display.update()
 
-		if getComputerMove(mainBoard, all_positions) == True:
+		if getComputerMove(all_positions) == True:
 		    turn = 'player'
 
                 #if determine(all_positions) == True:
                     #turn = 'player'
-                     
 
             pygame.display.update()
         gameExit()
@@ -85,13 +84,32 @@ def gameExit():
     pygame.quit()
     exit()
 
-def getComputerMove(board, all_positions):
+def movePosition(board, all_positions):
+
+##The values from the coordinates are inverses of the board coordinates. Therefore, we can call the
+##mouse coordinates x y and pass them into all_positions nested list as y x to get correct positioning.
+##We can do the same for the Easy computer AI.
+
+    posx, posy = pygame.mouse.get_pos()
+    mousex, mousey = getMouseClick(board, posx, posy)
+
+    try:
+        if all_positions[mousey][mousex] == 0:
+            all_positions[mousey][mousex] = 1
+            drawCircle(mousex, mousey, 0,0)
+            return True
+    except TypeError:
+        pass
+    
+    print 'Returning a False, Captain' 
+    return False
+
+def getComputerMove(all_positions):
 
     posx, posy = random.randint(0,2), random.randint(0,2)
     computer_move = False
     
     if computer_move == False:
-
 	if all_positions[posy][posx] == 0:
 	    all_positions[posy][posx] = 2
 	    computer_move = True
@@ -101,22 +119,6 @@ def getComputerMove(board, all_positions):
     if computer_move == True:
          drawX(posx, posy, 0)
          return computer_move
-
-def movePosition(board, all_positions):
-
-##The values from the coordinates are inverses of the board coordinates. Therefore, we can call the
-##mouse coordinates x y and pass them into all_positions nested list as y x to get correct positioning.
-
-    posx, posy = pygame.mouse.get_pos()
-    mousex, mousey = getMouseClick(board, posx, posy)
-
-    if all_positions[mousey][mousex] == 0:
-        all_positions[mousey][mousex] = 1
-        drawCircle(mousex, mousey, 0,0)
-        return True
-
-    print 'Returning a False, Captain' 
-    return False
 
 def winningMoves(all_positions):
 
@@ -152,7 +154,7 @@ def makeMove(all_positions, position):
    all_positions[position] = player
 
 def minimax(node, player):
-    if node.winningMoves(all_positions):
+    if computerAI(transpositions):
         if node.player == 1:
             return -1
         if node.player == 0:
