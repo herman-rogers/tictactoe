@@ -1,4 +1,4 @@
-import pygame, sys, os, random, time, itertools
+import pygame, sys, os, random, time, itertools, operator
 from pygame.locals import*
 
 WINDOWWIDTH = 1000
@@ -31,16 +31,15 @@ def mainGame():
         global FPSCLOCK, SURFACE, RESET_RECT
         pygame.init()
         pygame.display.set_caption('Tic-Tac-War')
-        turn = random.choice(['computer', 'player'])
-        player1 = 1
-        player2 = 2
-        mousex = 0
-        mousey = 0
         FPSCLOCK = pygame.time.Clock()
         SURFACE = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+        
+        turn = random.choice(['computer', 'player'])
+     #   winner = ('X-win', 'Draw', 'O-win')
+        mousex, mousey = 0,0
         game_state = 1
         mainBoard = generateNewBoard(80)
-        all_positions = [ ##Board Data Structure
+        all_positions = [     ##Board Data Structure##
                [0,0,0],
 	       [0,0,0],
 	       [0,0,0],
@@ -49,17 +48,10 @@ def mainGame():
 ########This is the Main loop###########
         while game_state == 1:
             if turn == 'player':
-
-                if noMoreMoves(all_positions) == False:
-                    print 'This Game is a Draw'
-                    gameExit()
-
-                elif winningMoves(all_positions) == False:
-                    print 'Computer Won the Game'
+                if winningMoves(all_positions) == True:
                     gameExit()
 
                 for event in pygame.event.get():
-
                        if event.type == MOUSEBUTTONUP:
 
                            if movePosition(mainBoard, all_positions) == True:
@@ -69,12 +61,7 @@ def mainGame():
                     gameExit()
 
             elif turn == 'computer':
-
-                if noMoreMoves(all_positions) == False:
-                    print 'This Game is a Draw'
-                    gameExit()
-
-                elif winningMoves(all_positions) == False:
+                if winningMoves(all_positions) == True:
                     print 'You Has Won, Sire'
                     gameExit()
 
@@ -84,8 +71,12 @@ def mainGame():
                 while time.time() < pauseUntil:
                     pygame.display.update()
 
-                if getComputerMove(all_positions) == True:
-                    turn = 'player'
+		if getComputerMove(mainBoard, all_positions) == True:
+		    turn = 'player'
+
+                #if determine(all_positions) == True:
+                    #turn = 'player'
+                     
 
             pygame.display.update()
         gameExit()
@@ -94,58 +85,16 @@ def gameExit():
     pygame.quit()
     exit()
 
-def getComputerMove(all_positions):
+def getComputerMove(board, all_positions):
 
-    posx = random.randint(0,2)
-    posy = random.randint(0,2)
+    posx, posy = random.randint(0,2), random.randint(0,2)
     computer_move = False
-
+    
     if computer_move == False:
 
-        if (posx, posy) == (0,1) and all_positions[1][0] == 0:
-            all_positions[1][0] = 2
-            computer_move = True
-
-        elif (posx, posy) == (1,1) and all_positions[1][1] == 0:
-            all_positions[1][1] = 2
-            computer_move = True
-
-
-        elif (posx, posy) == (2,1) and all_positions[1][2] == 0:
-            all_positions[1][2] = 2 
-            computer_move = True
-
-
-    ##Top Row Values [1,4,7]
-        elif (posx, posy) == (0,0) and all_positions[0][0] == 0:
-            all_positions[0][0] = 2
-            computer_move = True
-
-        elif (posx, posy) == (1,0) and all_positions[0][1] == 0:
-            all_positions[0][1] = 2
-            computer_move = True
-
-
-        elif (posx, posy) == (2,0) and all_positions [0][2] == 0:
-            all_positions[0][2] = 2
-            computer_move = True
-
-
-    ##Bottom Row Values [3,6,9]
-        elif (posx, posy) == (0,2) and all_positions[2][0] == 0:
-            all_positions[2][0] = 2
-            computer_move = True
-
-
-        elif (posx, posy)== (1,2) and all_positions[2][1] == 0:
-            all_positions[2][1] = 2
-            computer_move = True
-
-
-        elif (posx, posy) == (2,2) and all_positions[2][2] == 0:
-            all_positions[2][2] = 2
-            computer_move = True
-
+	if all_positions[posy][posx] == 0:
+	    all_positions[posy][posx] = 2
+	    computer_move = True
     else:
 	getComputerMove(all_positions)
 
@@ -153,77 +102,24 @@ def getComputerMove(all_positions):
          drawX(posx, posy, 0)
          return computer_move
 
-
-
-
-##This Registers the Player's Move
-
 def movePosition(board, all_positions):
+
+##The values from the coordinates are inverses of the board coordinates. Therefore, we can call the
+##mouse coordinates x y and pass them into all_positions nested list as y x to get correct positioning.
 
     posx, posy = pygame.mouse.get_pos()
     mousex, mousey = getMouseClick(board, posx, posy)
 
-    ##Center Row Values [2,5,8]
-    if (mousex, mousey) == (0,1) and all_positions[1][0] == 0:
-        all_positions[1][0] = 1
+    if all_positions[mousey][mousex] == 0:
+        all_positions[mousey][mousex] = 1
+        drawCircle(mousex, mousey, 0,0)
+        return True
 
-    elif (mousex, mousey) == (1,1) and all_positions[1][1] == 0:
-        all_positions[1][1] = 1
-
-    elif (mousex, mousey) == (2,1) and all_positions[1][2] == 0:
-        all_positions[1][2] = 1 
-
-    ##Top Row Values [1,4,7]
-    elif (mousex, mousey) == (0,0) and all_positions[0][0] == 0:
-        all_positions[0][0] = 1
-    
-    elif (mousex, mousey) == (2,2) and all_positions[2][2] == 0:
-        all_positions[2][2] = 1
-
-    elif (mousex, mousey) == (1,0) and all_positions[0][1] == 0:
-        all_positions[0][1] = 1
-
-    elif (mousex, mousey) == (2,0) and all_positions [0][2] == 0:
-        all_positions[0][2] = 1
-
-    ##Bottom Row Values [3,6,9]
-    elif (mousex, mousey) == (0,2) and all_positions[2][0] == 0:
-        all_positions[2][0] = 1
-
-    elif (mousex, mousey) == (1,2) and all_positions[2][1] == 0:
-        all_positions[2][1] = 1
-
-    elif (mousex, mousey) == (2,2) and all_positions[2][2] == 0:
-        all_positions[2][2] = 1
-
-    else:
-       
-        print 'Returning a False, Captain' 
-        return False
-
-    drawCircle(mousex, mousey,0,0)
-    return True
-
-def getMouseClick(board, x, y):
-
-    for tileX in range(len(board)):
-        for tileY in range(len(board[0])):
-            left, top = getLeftTopCoords(tileX, tileY)
-            tileRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE)
-            if tileRect.collidepoint(x,y):
-                return(tileX, tileY)
-    return (None,None)
-
-def getLeftTopCoords(tileX, tileY):
-
-    left = XMARGIN + (tileX * BOXSIZE) + (tileX - 1)
-    top = YMARGIN + (tileY * BOXSIZE) + (tileY - 1)
-    return (left, top) 
+    print 'Returning a False, Captain' 
+    return False
 
 def winningMoves(all_positions):
 
-    print availableMoves(all_positions)
-    
     numberRows = len(all_positions)
     lft = [ [0] * i for i in range(numberRows) ]
     reverselist = list(reversed(lft))
@@ -240,35 +136,110 @@ def winningMoves(all_positions):
             string = ''.join(map(str, row))
             for player in range(1,3):
                 if string.find(str(player) * 3) >= 0:
-                    print 'player={0} direction={1}'.format(player, direction)
-                    return False
-    return True
+                    print 'player={0} direction={1}'.format(player, direction)    ##Uncomment to check player/position debugging
+                    return True
+    return False
 
-def noMoreMoves(all_positions):
+def trackMovesLeft(all_positions):
 
-    no_moves_left = itertools.chain.from_iterable(all_positions)
-    if 0 not in no_moves_left:
-        return False
-    return True
+    list_of_moves = itertools.chain.from_iterable(all_positions)
+    moves_left = [k for k, v in enumerate(list_of_moves) if v is 0]
+    return moves_left   
 
-#############Constructing the minimax formula#######################################################
+#############Constructing the minimax algo#######################################################
+
+def makeMove(all_positions, position):
+   all_positions[position] = player
+
+def minimax(node, player):
+    if node.winningMoves(all_positions):
+        if node.player == 1:
+            return -1
+        if node.player == 0:
+            return 0
+        elif node.player == 2:
+            return 1
+
+    best = None
+   
+    for move in node.availableMoves(all_positions):
+	make_move(move, player)
+	val = minimax(node, enemy, alpha, beta)
+	node.make_move(move, None)
+	if player == 2:
+	    if val > best:
+		best = val
+	else:
+	    if val < best:
+		best = val
+	return best
+
+#def determine(all_positions):
+    #a = -2
+    #choices = []
+
+    #for move in availableMoves(all_positions):
+	#availableMoves.make_move(move, player)
+	#val = board.minimax(all_positions, player, -2, 2)
+	#board.make_move(move, None)
+
+	#if val > a:
+	    #a = val
+	    #choices = [move]
+	#elif val == a:
+	    #choices.append(move)
+    #return random.choice(choices)
+
+#def availableMoves(all_positions):
+    #make_list = itertools.chain.from_iterable(all_positions)
+    #return [k for k, v in enumerate(make_list) if v is None]
+
+def computerMinimax(all_positions):
+
+    if len(trackMovesLeft(all_positions)) == 9:
+        all_positions[1][1] = 1
 
 
 
 
-def availableMoves(all_positions):
-
-    make_list = itertools.chain.from_iterable(all_positions)
-    return [k for k, v in enumerate(make_list) if v is 0]
 
 
-def getUtility(node, all_positions):
+
+#def itemInList(all_positions):
+
+    #for inner_l in all_positions:
+	#for item in inner_l:
+	    #return item
+
+#def make_move(position, player):
+   #all_positions[position] = player 
+ 
+
+
+
+
 
 
 
 
 ############################################END OF CONSTRUCTION#######################################
 
+##Coordinates for Board and Mouse Clicks
+def getMouseClick(board, x, y):
+
+    for tileX in range(len(board)):
+        for tileY in range(len(board[0])):
+            left, top = getLeftTopCoords(tileX, tileY)
+            tileRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE)
+            if tileRect.collidepoint(x,y):
+                return(tileX, tileY)
+    return (None,None)
+
+def getLeftTopCoords(tileX, tileY):
+
+    left = XMARGIN + (tileX * BOXSIZE) + (tileX - 1)
+    top = YMARGIN + (tileY * BOXSIZE) + (tileY - 1)
+    return (left, top) 
 
 ## Drawing the Main Game Board
 
@@ -306,8 +277,6 @@ def generateNewBoard(self):
     drawBoard(board)
     pygame.display.update()
     return (board)
-
-
 
 ## Images and Image Handling
 
