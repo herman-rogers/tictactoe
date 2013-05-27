@@ -1,5 +1,6 @@
 import pygame, sys, os, random, time, itertools, operator
 from pygame.locals import*
+from itertools import*
 
 WINDOWWIDTH = 1000
 WINDOWHEIGHT = 700
@@ -33,58 +34,178 @@ def mainGame():
         pygame.display.set_caption('Tic-Tac-War')
         FPSCLOCK = pygame.time.Clock()
         SURFACE = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-        
         turn = random.choice(['computer', 'player'])
-     #   winner = ('X-win', 'Draw', 'O-win')
-        mousex, mousey = 0,0
-        game_state = 1
+        board_data = AI()
         mainBoard = generateNewBoard(80)
-        all_positions = [     ##Board Data Structure##
-               [0,0,0],
-	       [0,0,0],
-	       [0,0,0],
-	       ]
- 
-########This is the Main loop###########
-        while game_state == 1:
+        gamestate = 1
+
+        while not board_data.boardComplete():
+            player = 'X'
+
             if turn == 'player':
-                if winningMoves(all_positions) == True:
-                    gameExit()
+#                if winningMoves(all_positions, player) == True:
+                    #gameExit()
 
                 for event in pygame.event.get():
                        if event.type == MOUSEBUTTONUP:
 
-                           if movePosition(mainBoard, all_positions) == True:
-                               turn = 'computer'
+                           player_move = movePosition(mainBoard, board_data, player)
+                           if not player_move in board_data.trackMovesLeft():
+                               continue
+                           board_data.makeMove(player_move, player)
+                           turn = 'computer'
 
                 if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):    
                     gameExit()
 
             elif turn == 'computer':
-                if winningMoves(all_positions) == True:
-                    print 'You Has Won, Sire'
-                    gameExit()
+#                if winningMoves(all_positions, player) == True:
+                    #print 'You Has Won, Sire'
+                    #gameExit()
 
                 ##Make the computer seem like it's thinking
-
                 pauseUntil = time.time() + random.randint(2,5)*0.1
                 while time.time() < pauseUntil:
                     pygame.display.update()
 
-		if getComputerMove(all_positions) == True:
-		    turn = 'player'
-
-                #if determine(all_positions) == True:
-                    #turn = 'player'
-
-            pygame.display.update()
+       #         if randomComputerAI(all_positions) == True:
+		    #turn = 'player'
+                player = getEnemy(player)
+		computer_move = determine(board_data, player)
+		board_data.makeMove(computer_move, player)
+                turn = 'player'
+	    pygame.display.update()
         gameExit()
+
+####NEXT AI ATTEMPT ####
+class AI(object):
+
+    winning_moves = (
+              [0,1,2],[3,4,5],[6,7,8],
+              [0,3,6],[1,4,7],[2,5,8],
+              [0,4,8],[2,4,6],
+                    )
+
+    winners = ('X-win', 'Draw', 'O-win')
+
+    ##Board Data Structure !(Different from Graphical Data Structure)##
+    def __init__(self, all_positions=[]):
+        if len(all_positions) == 0:
+            self.all_positions = [0 for i in range(9)]
+        else:
+            self.all_positions = all_positions
+
+    def trackMovesLeft(self):
+        return [k for k, v in enumerate(self.all_positions) if v is 0]
+
+    def availableCombos(self, player):
+        return self.trackMovesLeft() + self.getPositions(player)
+
+    def boardComplete(self):
+        if 0 not in [v for v in self.all_positions]:
+            return True
+        if self.winner() != None:
+            return True
+        return False
+
+    def xWon(self):
+        return self.winner() == 'X'
+
+    def oWon(self):
+        return self.winner() == 'O'
+
+    def draw(self):
+        return self.boardComplete() == True and self.winner() is None
+
+    def winner(self):
+        for player in ('X', 'O'):
+            positions = self.getPositions(player)
+            for combo in self.winning_moves:
+                win = True
+                for pos in combo:
+                    if pos not in positions:
+                        win = False
+                if win:
+                    return player
+        return None
+
+    def getPositions(self, player):
+        return [k for k, v in enumerate(self.all_positions) if v == player]
+
+    def makeMove(self, position, player):
+        self.all_positions[position] = player
+
+    def miniMax(self, node, player, alpha, beta):
+        if node.boardComplete():
+            if node.xWon():
+                return -1
+            elif node.draw():
+                return 0
+            elif node.oWon():
+                return 1
+
+        for move in node.trackMovesLeft():
+            node.makeMove(move, player)
+            variable = self.miniMax(node, getEnemy(player), alpha, beta)
+            node.makeMove(move, 0)
+#        print outcomes
+        #print all_positions
+
+            if player == 'O':
+                if variable > alpha:
+                    alpha = variable
+                if alpha >= beta:
+                    return beta
+
+            else:
+                if variable < beta:
+                    beta = variable
+                if beta <= alpha:
+                    return alpha
+
+        if player == 'O':
+            return alpha
+        else:
+            return beta
+
+def determine(board_data, player):
+    a = -2
+    choices = []
+    make_coords = list(product(range(3), repeat =2 ))
+
+    if len(board_data.trackMovesLeft()) == 9:
+	posx, posy = make_coords[4]
+	drawX(posy, posx, 0)
+        return 4
+
+    for move in board_data.trackMovesLeft():
+
+        board_data.makeMove(move, player)
+        variable = board_data.miniMax(board_data, getEnemy(player), -2, 2)
+        board_data.makeMove(move, 0)
+        print 'move:', move + 1, 'causes:', board_data.winners[variable]
+        if variable > a:
+            a = variable
+            choices = [move]
+        elif variable == a:
+            choices.append(move)
+
+    choose_move = random.choice(choices)
+    posx,posy = make_coords[choose_move]
+    drawX(posy, posx, 0)
+    return choose_move
+
+def getEnemy(player):
+    if player == 'X':
+        return 'O'
+    return 'X'
+
 
 def gameExit():
     pygame.quit()
     exit()
 
-def movePosition(board, all_positions):
+def movePosition(board, board_data, player):
 
 ##The values from the coordinates are inverses of the board coordinates. Therefore, we can call the
 ##mouse coordinates x y and pass them into all_positions nested list as y x to get correct positioning.
@@ -92,141 +213,35 @@ def movePosition(board, all_positions):
 
     posx, posy = pygame.mouse.get_pos()
     mousex, mousey = getMouseClick(board, posx, posy)
+    get_list = zip(*[iter(enumerate(board_data.all_positions))]*3)
+    get_matrix = map(list, zip(*get_list))
 
     try:
-        if all_positions[mousey][mousex] == 0:
-            all_positions[mousey][mousex] = 1
-            drawCircle(mousex, mousey, 0,0)
-            return True
+        for value in get_matrix[mousex][mousey]:
+            if value in board_data.trackMovesLeft():
+                drawCircle(mousex, mousey, 0,0)
+            return value
     except TypeError:
         pass
-    
     print 'Returning a False, Captain' 
-    return False
 
-def getComputerMove(all_positions):
+def randomComputerAI(all_positions):
 
     posx, posy = random.randint(0,2), random.randint(0,2)
     computer_move = False
-    
+ 
     if computer_move == False:
 	if all_positions[posy][posx] == 0:
-	    all_positions[posy][posx] = 2
+	    all_positions[posy][posx] = 1
 	    computer_move = True
     else:
-	getComputerMove(all_positions)
+	randomComputerAI(all_positions)
 
     if computer_move == True:
          drawX(posx, posy, 0)
          return computer_move
 
-def winningMoves(all_positions):
-
-    numberRows = len(all_positions)
-    lft = [ [0] * i for i in range(numberRows) ]
-    reverselist = list(reversed(lft))
-
-    transpositions = {
-    'horizontal' : all_positions,
-    'vertical'    : zip(*all_positions),
-    'diag_forw'  : zip(* [lft[i] + all_positions[i] + reverselist[i] for i in range(numberRows)] ),
-    'diag_back'  : zip(* [reverselist[i] + all_positions[i] + lft[i] for i in range(numberRows)] ),
-    }
-
-    for direction, transp in transpositions.iteritems():
-        for row in transp:
-            string = ''.join(map(str, row))
-            for player in range(1,3):
-                if string.find(str(player) * 3) >= 0:
-                    print 'player={0} direction={1}'.format(player, direction)    ##Uncomment to check player/position debugging
-                    return True
-    return False
-
-def trackMovesLeft(all_positions):
-
-    list_of_moves = itertools.chain.from_iterable(all_positions)
-    moves_left = [k for k, v in enumerate(list_of_moves) if v is 0]
-    return moves_left   
-
-#############Constructing the minimax algo#######################################################
-
-def makeMove(all_positions, position):
-   all_positions[position] = player
-
-def minimax(node, player):
-    if computerAI(transpositions):
-        if node.player == 1:
-            return -1
-        if node.player == 0:
-            return 0
-        elif node.player == 2:
-            return 1
-
-    best = None
-   
-    for move in node.availableMoves(all_positions):
-	make_move(move, player)
-	val = minimax(node, enemy, alpha, beta)
-	node.make_move(move, None)
-	if player == 2:
-	    if val > best:
-		best = val
-	else:
-	    if val < best:
-		best = val
-	return best
-
-#def determine(all_positions):
-    #a = -2
-    #choices = []
-
-    #for move in availableMoves(all_positions):
-	#availableMoves.make_move(move, player)
-	#val = board.minimax(all_positions, player, -2, 2)
-	#board.make_move(move, None)
-
-	#if val > a:
-	    #a = val
-	    #choices = [move]
-	#elif val == a:
-	    #choices.append(move)
-    #return random.choice(choices)
-
-#def availableMoves(all_positions):
-    #make_list = itertools.chain.from_iterable(all_positions)
-    #return [k for k, v in enumerate(make_list) if v is None]
-
-def computerMinimax(all_positions):
-
-    if len(trackMovesLeft(all_positions)) == 9:
-        all_positions[1][1] = 1
-
-
-
-
-
-
-
-#def itemInList(all_positions):
-
-    #for inner_l in all_positions:
-	#for item in inner_l:
-	    #return item
-
-#def make_move(position, player):
-   #all_positions[position] = player 
- 
-
-
-
-
-
-
-
-
-############################################END OF CONSTRUCTION#######################################
-
-##Coordinates for Board and Mouse Clicks
+#### Coordinates for Board and Mouse Clicks
 def getMouseClick(board, x, y):
 
     for tileX in range(len(board)):
@@ -243,8 +258,7 @@ def getLeftTopCoords(tileX, tileY):
     top = YMARGIN + (tileY * BOXSIZE) + (tileY - 1)
     return (left, top) 
 
-## Drawing the Main Game Board
-
+#### Drawing the Main Game Board
 def drawBoard(board): 
 
     SURFACE.fill(BACKCOLOR)     
@@ -280,7 +294,7 @@ def generateNewBoard(self):
     pygame.display.update()
     return (board)
 
-## Images and Image Handling
+#### Images and Image Handling
 
 def drawCircle(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley)
@@ -302,6 +316,7 @@ def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
 
 def load_png(name):
     """This is so we can load objects relative paths"""
+
     fullname = os.path.join('data/images', name)
     try:
         image = pygame.image.load(fullname)
@@ -320,3 +335,4 @@ def load_png(name):
 
 if __name__ == '__main__':
     mainGame()
+
