@@ -1,9 +1,9 @@
-import pygame, sys, os, random, time, itertools, operator
+import pygame, pygame.mixer, sys, os, random, time, itertools, operator 
 from pygame.locals import*
 from itertools import*
 
-WINDOWWIDTH = 1000
-WINDOWHEIGHT = 700
+WINDOWWIDTH, WINDOWHEIGHT = 1280, 720 #854, 480
+WINDOWHEIGHT = 720
 BOARDWIDTH = 3
 BOARDHEIGHT = 3
 BOXSIZE = 130
@@ -24,62 +24,82 @@ BOARDCOLOR = WHITE
 TILECOLOR = BLACK
 CIRCLECOLOR = WHITE
 XCOLOR = WHITE
+TEXTCOLOR = WHITE
 
 XMARGIN = int((WINDOWWIDTH - (BOXSIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (BOXSIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
 
 def mainGame():
-        global FPSCLOCK, SURFACE, RESET_RECT
+        global FPSCLOCK, SURFACE
         pygame.init()
         pygame.display.set_caption('Tic-Tac-War')
         FPSCLOCK = pygame.time.Clock()
         SURFACE = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-        turn = random.choice(['computer', 'player'])
-        board_data = AI()
         mainBoard = generateNewBoard(80)
+        board_data = AI()
+        turn = random.choice(['computer', 'player'])
+        toggle_on = (['on'])
         gamestate = 1
 
-        while not board_data.boardComplete():
+        while gamestate == 1:
             player = 'X'
+            toggle_music = load_png('cat.png')
+            toggle_off = toggle_music.get_rect()
+            SURFACE.blit(toggle_music, toggle_off)
+
+            if board_data.boardComplete():
+                reset_image = load_png('cat.png')
+                reset_yes = reset_image.get_rect(center=(WINDOWWIDTH/2,WINDOWHEIGHT/2))
+                SURFACE.blit(reset_image, reset_yes)
+                for event in pygame.event.get():
+ 
+                   if event.type == MOUSEBUTTONUP:
+                        soundEffect()
+                        spotx, spoty = pygame.mouse.get_pos()
+                        if reset_yes.collidepoint((spotx, spoty)):
+                            mainBoard = generateNewBoard(80)
+                            board_data.all_positions = [0,0,0,0,0,0,0,0,0]
+
+                        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                            gameExit()
 
             if turn == 'player':
-#                if winningMoves(all_positions, player) == True:
-                    #gameExit()
-
                 for event in pygame.event.get():
-                       if event.type == MOUSEBUTTONUP:
+                    if event.type == MOUSEBUTTONUP:
+                        soundEffect()
+                        posx, posy = pygame.mouse.get_pos()
+                        if toggle_off.collidepoint((posx, posy)) and toggle_on == ['on']:
+                            pygame.mixer.music.pause()
+                            toggle_on = ['off']
+                        elif toggle_off.collidepoint((posx, posy)) and toggle_on == ['off']:
+                            pygame.mixer.music.unpause()
+                            toggle_on = ['on']
+                        player_move = movePosition(mainBoard, board_data, player)
+                        if not player_move in board_data.trackMovesLeft():
+                            continue
+                        board_data.makeMove(player_move, player)
+                        turn = 'computer'
 
-                           player_move = movePosition(mainBoard, board_data, player)
-                           if not player_move in board_data.trackMovesLeft():
-                               continue
-                           board_data.makeMove(player_move, player)
-                           turn = 'computer'
-
-                if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):    
-                    gameExit()
+                    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):    
+                        gameExit()
 
             elif turn == 'computer':
-#                if winningMoves(all_positions, player) == True:
-                    #print 'You Has Won, Sire'
-                    #gameExit()
+                '''Make the computer seem like it's thinking'''
+                pauseUntil = time.time() + random.randint(2,5)*0.2
 
-                ##Make the computer seem like it's thinking
-                pauseUntil = time.time() + random.randint(2,5)*0.1
                 while time.time() < pauseUntil:
                     pygame.display.update()
 
-       #         if randomComputerAI(all_positions) == True:
-		    #turn = 'player'
                 player = getEnemy(player)
 		computer_move = determine(board_data, player)
 		board_data.makeMove(computer_move, player)
+                soundEffect()
                 turn = 'player'
+
 	    pygame.display.update()
-        gameExit()
 
-####NEXT AI ATTEMPT ####
 class AI(object):
-
+    '''Class for determining both player and computer moves'''
     winning_moves = (
               [0,1,2],[3,4,5],[6,7,8],
               [0,3,6],[1,4,7],[2,5,8],
@@ -88,7 +108,7 @@ class AI(object):
 
     winners = ('X-win', 'Draw', 'O-win')
 
-    ##Board Data Structure !(Different from Graphical Data Structure)##
+    ##Board Data Structure (Different from Graphical Structure)
     def __init__(self, all_positions=[]):
         if len(all_positions) == 0:
             self.all_positions = [0 for i in range(9)]
@@ -133,7 +153,10 @@ class AI(object):
         return [k for k, v in enumerate(self.all_positions) if v == player]
 
     def makeMove(self, position, player):
-        self.all_positions[position] = player
+        try:
+            self.all_positions[position] = player
+        except TypeError:
+            pass
 
     def miniMax(self, node, player, alpha, beta):
         if node.boardComplete():
@@ -148,21 +171,17 @@ class AI(object):
             node.makeMove(move, player)
             variable = self.miniMax(node, getEnemy(player), alpha, beta)
             node.makeMove(move, 0)
-#        print outcomes
-        #print all_positions
 
             if player == 'O':
                 if variable > alpha:
                     alpha = variable
                 if alpha >= beta:
                     return beta
-
             else:
                 if variable < beta:
                     beta = variable
                 if beta <= alpha:
                     return alpha
-
         if player == 'O':
             return alpha
         else:
@@ -175,41 +194,39 @@ def determine(board_data, player):
 
     if len(board_data.trackMovesLeft()) == 9:
 	posx, posy = make_coords[4]
-	drawX(posy, posx, 0)
+	drawComputer(posy, posx, 0)
         return 4
 
     for move in board_data.trackMovesLeft():
-
         board_data.makeMove(move, player)
         variable = board_data.miniMax(board_data, getEnemy(player), -2, 2)
         board_data.makeMove(move, 0)
-        print 'move:', move + 1, 'causes:', board_data.winners[variable]
+      #  print 'move:', move + 1, 'causes:', board_data.winners[variable] ##uncomment for debugging
         if variable > a:
             a = variable
             choices = [move]
         elif variable == a:
             choices.append(move)
 
-    choose_move = random.choice(choices)
-    posx,posy = make_coords[choose_move]
-    drawX(posy, posx, 0)
-    return choose_move
+    try:
+        choose_move = random.choice(choices)
+        posx,posy = make_coords[choose_move]
+        drawComputer(posy, posx, 0)
+        return choose_move
+    except IndexError:
+        pass
 
 def getEnemy(player):
     if player == 'X':
         return 'O'
     return 'X'
 
-
 def gameExit():
     pygame.quit()
     exit()
 
 def movePosition(board, board_data, player):
-
-##The values from the coordinates are inverses of the board coordinates. Therefore, we can call the
-##mouse coordinates x y and pass them into all_positions nested list as y x to get correct positioning.
-##We can do the same for the Easy computer AI.
+    '''Get Board X,Y Coordinates from player and return list move'''
 
     posx, posy = pygame.mouse.get_pos()
     mousex, mousey = getMouseClick(board, posx, posy)
@@ -219,53 +236,37 @@ def movePosition(board, board_data, player):
     try:
         for value in get_matrix[mousex][mousey]:
             if value in board_data.trackMovesLeft():
-                drawCircle(mousex, mousey, 0,0)
+                drawPlayer(mousex, mousey, 0,0)
             return value
     except TypeError:
         pass
-    print 'Returning a False, Captain' 
+   # print 'You can\'t move there, Captain' ##Uncomment for debugging
 
-def randomComputerAI(all_positions):
-
-    posx, posy = random.randint(0,2), random.randint(0,2)
-    computer_move = False
- 
-    if computer_move == False:
-	if all_positions[posy][posx] == 0:
-	    all_positions[posy][posx] = 1
-	    computer_move = True
-    else:
-	randomComputerAI(all_positions)
-
-    if computer_move == True:
-         drawX(posx, posy, 0)
-         return computer_move
-
-#### Coordinates for Board and Mouse Clicks
 def getMouseClick(board, x, y):
-
+    '''Converts mouse coordinates to board coordinates'''
     for tileX in range(len(board)):
+
         for tileY in range(len(board[0])):
             left, top = getLeftTopCoords(tileX, tileY)
             tileRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE)
+            
             if tileRect.collidepoint(x,y):
                 return(tileX, tileY)
     return (None,None)
 
 def getLeftTopCoords(tileX, tileY):
-
     left = XMARGIN + (tileX * BOXSIZE) + (tileX - 1)
     top = YMARGIN + (tileY * BOXSIZE) + (tileY - 1)
     return (left, top) 
 
-#### Drawing the Main Game Board
 def drawBoard(board): 
-
-    SURFACE.fill(BACKCOLOR)     
+    '''Draw the main game graphical board'''
+    bg = load_png("background.png")
+    backgroundRect = bg.get_rect()
+    SURFACE.blit(bg, backgroundRect)
     left, top = getLeftTopCoords(0,0)
     width = BOARDWIDTH * BOXSIZE
     height = BOARDHEIGHT * BOXSIZE
-    pygame.draw.rect(SURFACE, BOARDCOLOR, (left - 5, top - 5, width + 11, height + 11)) 
 
     for tilex in range(len(board)):    
         for tiley in range(len(board[0])):
@@ -288,21 +289,21 @@ def getStartBoard():
     return board
 
 def generateNewBoard(self):
-
     board = getStartBoard()
     drawBoard(board)
     pygame.display.update()
     return (board)
 
-#### Images and Image Handling
+## Images and image Handling are stored here
 
-def drawCircle(tilex, tiley, number, adjx = 0, adjy = 0):
+def drawPlayer(tilex, tiley, number, adjx = 0, adjy = 0):
+
     left, top = getLeftTopCoords(tilex, tiley)
     centerleft, centertop = left + 65, top + 65 #to center circle divide BOXSIZE/2, then adjust both top and left
     pygame.draw.circle(SURFACE, CIRCLECOLOR, (centerleft + adjx, centertop + adjy), CIRCLESIZE)
     pygame.draw.circle(SURFACE, TILECOLOR, (centerleft + adjx, centertop + adjy), INSIDECIRCLE) #this is the inside of the Circle
 
-def drawX(tilex, tiley, number, adjx = 0, adjy = 0):
+def drawComputer(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley)
     centerleft, centertop = left + 65, top + 65
  
@@ -314,6 +315,16 @@ def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley,) 
     pygame.draw.rect(SURFACE, TILECOLOR, (left + adjx, top + adjy, BOXSIZE, BOXSIZE))
 
+def startMusic():
+    pygame.mixer.init()
+    pygame.mixer.music.load('data/sounds/skye.ogg')
+    pygame.mixer.music.play(-1)
+
+def soundEffect():
+    sound_effect = load_sound('soundeffect.ogg')
+    sound_effect.set_volume(0.5)
+    sound_effect.play()
+
 def load_png(name):
     """This is so we can load objects relative paths"""
 
@@ -323,16 +334,44 @@ def load_png(name):
         if image.get_alpha() is None:
             image = image.convert()
         else:
-            image = image.conver_alpha()
+            image = image.convert_alpha()
     except pygame.error, message:
         print 'Seems like I lost your image:', fullname
         raise SystemExit, message
     return image
 
-
+def load_sound(name):
+    class NoneSound:
+        def play(self): pass
+    if not pygame.mixer or not pygame.mixer.get_init():
+        return NoneSound()
+    fullname = os.path.join('data/sounds', name)
+    try:
+        sound = pygame.mixer.Sound(fullname)
+    except pygame.error:
+        print ('%s Music Not Found!' % fullname)
+	raise SystemExit(str(geterror()))
+    return sound
 
 ##################STARTING FUNCTION###################
 
 if __name__ == '__main__':
+    startMusic()
     mainGame()
 
+#def randomComputerAI(all_positions):
+    '''This is for an easy AI option, left in for future implementations'''
+
+#    posx, posy = random.randint(0,2), random.randint(0,2)
+    #computer_move = False
+ 
+    #if computer_move == False:
+	#if all_positions[posy][posx] == 0:
+	    #all_positions[posy][posx] = 1
+	    #computer_move = True
+    #else:
+	#randomComputerAI(all_positions)
+
+    #if computer_move == True:
+         #drawComputer(posx, posy, 0)
+         #return computer_move
