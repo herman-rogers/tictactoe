@@ -40,40 +40,71 @@ def mainGame():
         turn = random.choice(['computer', 'player'])
         toggle_on = (['on'])
         gamestate = 1
+        music_on = load_png('musicon.png')
+        toggle_yes = music_on.get_rect()
+        music_off = load_png('musicoff.png')
+        toggle_off = music_off.get_rect()
+        SURFACE.blit(music_on, toggle_yes)
 
         while gamestate == 1:
             player = 'X'
-            toggle_music = load_png('cat.png')
-            toggle_off = toggle_music.get_rect()
-            SURFACE.blit(toggle_music, toggle_off)
 
+            #Options and prompts for when the game is over.
             if board_data.boardComplete():
-                reset_image = load_png('cat.png')
-                reset_yes = reset_image.get_rect(center=(WINDOWWIDTH/2,WINDOWHEIGHT/2))
-                SURFACE.blit(reset_image, reset_yes)
+
+                computer_win = load_png('resetcomputerwon.png')
+                display_reset = computer_win.get_rect(center=(WINDOWWIDTH/2, WINDOWHEIGHT/2))
+
+                play_again = load_png('playagain.png')
+                reset_yes = play_again.get_rect(center=(WINDOWWIDTH/2 + 80,WINDOWHEIGHT/2 + 60))
+
+                exit_game = load_png('exitbutton.png')
+                exit_yes = play_again.get_rect(center=(WINDOWWIDTH/2 - 80, WINDOWHEIGHT/2 + 60))
+
+                draw_game = load_png('drawbox.png')
+                display_draw = draw_game.get_rect(center=(WINDOWWIDTH/2, WINDOWHEIGHT/2))
+                    
+                if board_data.winner() == 'O':
+                    SURFACE.blit(computer_win, display_reset)
+                    SURFACE.blit(play_again, reset_yes)
+                    SURFACE.blit(exit_game, exit_yes)
+                    
+                if board_data.winner() == None:
+                    SURFACE.blit(draw_game, display_draw)
+                    SURFACE.blit(play_again, reset_yes)
+                    SURFACE.blit(exit_game, exit_yes)
+
                 for event in pygame.event.get():
  
-                   if event.type == MOUSEBUTTONUP:
+                    if event.type == MOUSEBUTTONUP:
                         soundEffect()
                         spotx, spoty = pygame.mouse.get_pos()
                         if reset_yes.collidepoint((spotx, spoty)):
                             mainBoard = generateNewBoard(80)
+                            SURFACE.blit(music_on, toggle_yes)
                             board_data.all_positions = [0,0,0,0,0,0,0,0,0]
 
-                        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                        if exit_yes.collidepoint((spotx, spoty)):
                             gameExit()
+
+                    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                        gameExit()
 
             if turn == 'player':
                 for event in pygame.event.get():
                     if event.type == MOUSEBUTTONUP:
                         soundEffect()
                         posx, posy = pygame.mouse.get_pos()
-                        if toggle_off.collidepoint((posx, posy)) and toggle_on == ['on']:
+                        if toggle_yes.collidepoint((posx, posy)) and toggle_on == ['on']:
                             pygame.mixer.music.pause()
                             toggle_on = ['off']
+                            SURFACE.blit(music_off, toggle_off)
+
                         elif toggle_off.collidepoint((posx, posy)) and toggle_on == ['off']:
                             pygame.mixer.music.unpause()
                             toggle_on = ['on']
+                            SURFACE.blit(music_on, toggle_yes)
+
                         player_move = movePosition(mainBoard, board_data, player)
                         if not player_move in board_data.trackMovesLeft():
                             continue
@@ -261,7 +292,7 @@ def getLeftTopCoords(tileX, tileY):
 
 def drawBoard(board): 
     '''Draw the main game graphical board'''
-    bg = load_png("background.png")
+    bg = load_png("background2.png")
     backgroundRect = bg.get_rect()
     SURFACE.blit(bg, backgroundRect)
     left, top = getLeftTopCoords(0,0)
@@ -299,15 +330,17 @@ def generateNewBoard(self):
 def drawPlayer(tilex, tiley, number, adjx = 0, adjy = 0):
 
     left, top = getLeftTopCoords(tilex, tiley)
-    centerleft, centertop = left + 65, top + 65 #to center circle divide BOXSIZE/2, then adjust both top and left
-    pygame.draw.circle(SURFACE, CIRCLECOLOR, (centerleft + adjx, centertop + adjy), CIRCLESIZE)
-    pygame.draw.circle(SURFACE, TILECOLOR, (centerleft + adjx, centertop + adjy), INSIDECIRCLE) #this is the inside of the Circle
+    centerleft, centertop = left + 65, top + 65
+ 
+    penguine_image = load_png("player.png")
+    resizePenguine = pygame.transform.scale(penguine_image, (XSIZE, XSIZE))
+    SURFACE.blit(resizePenguine, (left + adjx, top + adjy))
 
 def drawComputer(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley)
     centerleft, centertop = left + 65, top + 65
  
-    penguine_image = load_png("penguine.png")
+    penguine_image = load_png("computer.png")
     resizePenguine = pygame.transform.scale(penguine_image, (XSIZE, XSIZE))
     SURFACE.blit(resizePenguine, (left + adjx, top + adjy))
 
