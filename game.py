@@ -1,30 +1,21 @@
+'''This is free software created by Herman Rogers and distributed under the GNU General Public License (2013) and is intended for non-commercial education purposes.'''
+
 import pygame, pygame.mixer, sys, os, random, time, itertools, operator 
 from pygame.locals import*
 from itertools import*
 
 WINDOWWIDTH, WINDOWHEIGHT = 1280, 720 #854, 480
-WINDOWHEIGHT = 720
 BOARDWIDTH = 3
 BOARDHEIGHT = 3
 BOXSIZE = 130
-CIRCLESIZE = 60
-INSIDECIRCLE = 50
 XSIZE = 130
  
 #Color Index -- Changing these values changes the colors
 #          R   G   B
-WHITE = ((255,255,255))
-BLACK = ((0,0,0))
-DARKTURQUOISE = ((3,54,73))
-BRIGHTBLUE = ((0, 50, 255, 0))
 
-BORDERCOLOR = BRIGHTBLUE
-BACKCOLOR = DARKTURQUOISE
-BOARDCOLOR = WHITE
+BLACK = ((0,0,0))
+
 TILECOLOR = BLACK
-CIRCLECOLOR = WHITE
-XCOLOR = WHITE
-TEXTCOLOR = WHITE
 
 XMARGIN = int((WINDOWWIDTH - (BOXSIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (BOXSIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
