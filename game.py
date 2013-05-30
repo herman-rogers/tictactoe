@@ -323,17 +323,17 @@ def drawPlayer(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley)
     centerleft, centertop = left + 65, top + 65
  
-    penguine_image = load_png("player.png")
-    resizePenguine = pygame.transform.scale(penguine_image, (XSIZE, XSIZE))
-    SURFACE.blit(resizePenguine, (left + adjx, top + adjy))
+    player_image = load_png("player.png")
+    resizePlayer = pygame.transform.scale(player_image, (XSIZE, XSIZE))
+    SURFACE.blit(resizePlayer, (left + adjx, top + adjy))
 
 def drawComputer(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley)
     centerleft, centertop = left + 65, top + 65
  
-    penguine_image = load_png("computer.png")
-    resizePenguine = pygame.transform.scale(penguine_image, (XSIZE, XSIZE))
-    SURFACE.blit(resizePenguine, (left + adjx, top + adjy))
+    computer_image = load_png("computer.png")
+    resizeComputer = pygame.transform.scale(computer_image, (XSIZE, XSIZE))
+    SURFACE.blit(resizeComputer, (left + adjx, top + adjy))
 
 def drawSquare(tilex, tiley, number, adjx = 0, adjy = 0):
     left, top = getLeftTopCoords(tilex, tiley,) 
