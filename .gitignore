@@ -3,3 +3,4 @@ venv
 *.swp
 *.game.py.swn
 *.game.py.swo
+*.pyc
