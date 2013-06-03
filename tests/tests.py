@@ -23,33 +23,6 @@ class testBoardDataStructure(unittest.TestCase):
         start_moves = [0,1,2,3,4,5,6,7,8]
         self.assertEqual(start_moves, board_data.trackMovesLeft())
 
-#    def testBoardWinner(self):
-        #board_data.winner == 'X'
-	#self.assertTrue(board_data.boardComplete())
-
-
-
-    def testIfPlayerXHasWon(self):
-        player = 'X'
-        positions = [0,1,2]
-        self.assertNotEqual(board_data.winner(), 'O')
-
-
-    def testBoardCompleteDefaultsFalse(self):
-        self.assertFalse(board_data.boardComplete())
-
-    def testCheckMovesAvailable(self):
-        board_data.all_positions = [0,0]
-        self.assertFalse(board_data.boardComplete())
-
-    def testBoardWinnerDefaultsNone(self):
-        self.assertEqual(board_data.winner(player), None)
-
-    #def testBoardWinnerIsDraw(self):
-	#board_data.all_positions = []
-	#board_data.winner == 'X'
-	#self.assertTrue(board_data.draw())
-	
     def testXPlayerPositions(self):
         get_player = 'X'
         board_data.all_positions = ['X',0,0,'O','X','X',0,'O',0]
@@ -62,16 +35,37 @@ class testBoardDataStructure(unittest.TestCase):
         O_positions = [2,4,8]
         self.assertEqual(O_positions, board_data.getPositions(get_player))
 
+class testBoardWinLoseDrawConditions(unittest.TestCase):
 
-    #def testMakePlayerMove(self):
+    def testWinnerDefaultToNone(self):
+        board_data.all_positions = [0,0,0,0,0,0,0,0,0]
+        self.assertEqual(board_data.winner(), None)
 
-       #player = 'X'
-       #self.assertEqual(player, board_data.makeMove(3, player)) 
+    def testMovesAvailableIsTracked(self):
+        board_data.all_positions = [0,0]
+        self.assertFalse(board_data.boardComplete())
 
+    def testBoardCompleteDefaultsFalse(self):
+        self.assertFalse(board_data.boardComplete())
+
+    def testBoardWinnerDefaultsNone(self):
+        self.assertEqual(board_data.winner(), None)
+
+    def testGameIsDraw(self):
+        board_data.all_positions = ['X','X','O','X','X','O','O','O','X']
+        self.assertTrue(board_data.boardComplete())
+
+    def testPlayerXHasWon(self):
+        board_data.all_positions = ['X','X','X',0,0,0,0,0,0]
+        self.assertTrue(board_data.winner() == 'X')
+
+    def testPlayerOHasWon(self):
+        board_data.all_positions = ['O','O','O',0,'X','X',0,0,0]
+        self.assertTrue(board_data.winner() == 'O')
 
     def testGetEnemyPlayer(self):
-        #getPlayer = 'X'
-        self.assertEqual('O', getEnemy())
+        player = 'X'
+        self.assertEqual('O', getEnemy(player))
 
 
 if __name__ == '__main__':

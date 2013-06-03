@@ -4,8 +4,6 @@ from gamefiles.game import*
 
 class loadMedia(object):
 
-    pygame.mixer.init()
-
     def loadPng(self, name):
 
         fullname = os.path.join('data/images', name)
@@ -41,6 +39,7 @@ class loadMedia(object):
         sound_effect.play()
 
     def getMusic(self):
+        pygame.mixer.init()
 	pygame.mixer.music.load('data/sounds/skye.ogg')
 	pygame.mixer.music.play(-1)
 

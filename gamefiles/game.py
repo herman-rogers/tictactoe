@@ -9,7 +9,6 @@ from datahandler.loadingdata import*
 from computerAI.minimaxAI import getEnemy, determine, board_data
 from pygame.locals import*
 
-
 class gameStart(object):
 
     def mainGame(self):
