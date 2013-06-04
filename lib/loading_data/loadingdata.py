@@ -1,6 +1,8 @@
 import os, pygame, sys
 
-from gamefiles.game import*
+sys.path.append("..")
+
+from lib.game import*
 
 class loadMedia(object):
 

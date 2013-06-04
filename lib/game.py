@@ -2,11 +2,9 @@
 
 import pygame, pygame.mixer, sys, os, random, time
 
-sys.path.insert(0, os.path.abspath(".."))
-
-from displayset.window_settings import*
-from datahandler.loadingdata import*
-from computerAI.minimaxAI import getEnemy, determine, board_data
+from window_settings.windowsettings import*
+from loading_data.loadingdata import*
+from minimax_AI.minimaxAI import getEnemy, determine, board_data
 from pygame.locals import*
 
 class gameStart(object):
