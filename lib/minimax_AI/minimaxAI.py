@@ -1,7 +1,9 @@
 import random, sys, os
 from itertools import*
 
-from gamefiles.game import*
+sys.path.append("..")
+
+from lib.game import*
 
 class AI(object):
 
@@ -20,6 +22,9 @@ class AI(object):
 
     def trackMovesLeft(self):
         return [k for k, v in enumerate(self.all_positions) if v is 0]
+
+    def getPositions(self, player):
+        return [k for k, v in enumerate(self.all_positions) if v == player]
 
     def boardComplete(self):
         if 0 not in [v for v in self.all_positions]:
@@ -48,9 +53,6 @@ class AI(object):
                 if win:
                     return player
         return None
-
-    def getPositions(self, player):
-        return [k for k, v in enumerate(self.all_positions) if v == player]
 
     def makeMove(self, position, player):
         try:
