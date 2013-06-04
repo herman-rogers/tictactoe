@@ -58,23 +58,31 @@ class testBoardWinLoseDrawConditions(unittest.TestCase):
 	self.ai.all_positions = ['O','X','O','X','O','X','X','O','X']
 	self.assertTrue(self.ai.boardComplete())
 
-    def testBoardCompleteXHasWon(self):
-	self.ai.all_positions = ['X','X','X',0,0,0,0,0,0]
-	self.assertTrue(self.ai.boardComplete())
-
-    def testBoardCompleteOHasWon(self):
-        self.ai.all_positions = ['O','O','O',0,0,0,0,0,0]
-        self.assertTrue(self.ai.boardComplete())
-
     def testWinnerPlayerX(self):
 	self.ai.all_positions = ['X','X','X',0,0,0,0,0,0]
 	self.assertTrue(self.ai.winner() == 'X')
 
     def testWinnerPlayerO(self):
-	board_data.all_positions = ['O','O','O',0,0,0,0,0,0]
-	self.assertTrue(board_data.winner() == 'O')
+	self.ai.all_positions = ['O','O','O',0,0,0,0,0,0]
+	self.assertTrue(self.ai.winner() == 'O')
 
-class testMiniMax(unittest.TestCase):
+class testDetermineMiniMax(unittest.TestCase):
+
+    def setUp(self):
+        self.ai = board_data
+
+    def testFirstMoveTakeCenter(self):
+        self.ai.all_positions = [0,0,0,0,0,0,0,0,0]
+        self.assertEqual(4, determine(board_data, 'X'))
+
+
+
+
+
+
+
+
+
 
     def testGetEnemyPlayer(self):
         player = 'X'
