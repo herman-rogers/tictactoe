@@ -89,10 +89,12 @@ class AI(object):
         else:
             return beta
 
+board_data = AI()
+
 def determine(board_data, player):
     a = -2
     choices = []
-    make_coords = list(product(range(3), repeat =2 ))
+    make_coords = list(product(range(3), repeat=2 ))
 
     if len(board_data.trackMovesLeft()) == 9:
 	posx, posy = make_coords[4]
@@ -126,4 +128,3 @@ def gameExit():
     pygame.quit()
     exit()
 
-board_data = AI()

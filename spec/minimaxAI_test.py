@@ -35,12 +35,10 @@ class testBoardDataStructure(unittest.TestCase):
         self.assertEqual(moves_left, self.ai.trackMovesLeft())
 
     def testReturnCorrectXPlayerPositions(self):
-        X_positions = [2]
-        self.assertEqual(X_positions, self.ai.getPositions('X'))
+        self.assertEqual([2], self.ai.getPositions('X'))
 
     def testReturnCorrectOPlayerPositions(self):
-        O_positions = [3]
-        self.assertEqual(O_positions, self.ai.getPositions('O'))
+        self.assertEqual([3], self.ai.getPositions('O'))
 
 class testBoardWinLoseDrawConditions(unittest.TestCase):
 
@@ -58,29 +56,60 @@ class testBoardWinLoseDrawConditions(unittest.TestCase):
 	self.ai.all_positions = ['O','X','O','X','O','X','X','O','X']
 	self.assertTrue(self.ai.boardComplete())
 
-    def testBoardCompleteXHasWon(self):
-	self.ai.all_positions = ['X','X','X',0,0,0,0,0,0]
-	self.assertTrue(self.ai.boardComplete())
-
-    def testBoardCompleteOHasWon(self):
-        self.ai.all_positions = ['O','O','O',0,0,0,0,0,0]
-        self.assertTrue(self.ai.boardComplete())
-
     def testWinnerPlayerX(self):
 	self.ai.all_positions = ['X','X','X',0,0,0,0,0,0]
 	self.assertTrue(self.ai.winner() == 'X')
 
     def testWinnerPlayerO(self):
-	board_data.all_positions = ['O','O','O',0,0,0,0,0,0]
-	self.assertTrue(board_data.winner() == 'O')
+	self.ai.all_positions = ['O','O','O',0,0,0,0,0,0]
+	self.assertTrue(self.ai.winner() == 'O')
 
 class testMiniMax(unittest.TestCase):
 
-    def testGetEnemyPlayer(self):
-        player = 'X'
-        self.assertEqual('O', getEnemy(player))
+    def setUp(self):
+        self.ai = board_data
+        self.player = 'O'
 
+    def testEnemyWonReturnNegativeValue(self):
+        self.ai.all_positions = ['X','X','X',0,0,0,0,0,0]
+        self.assertEqual(-1, self.ai.miniMax(self.ai, self.player, -2, 2))
+
+    def testComputerWinReturnPositiveValue(self):
+        self.ai.all_positions = ['O','O','O',0,0,0,0,0,0]
+        self.assertEqual(1, self.ai.miniMax(self.ai, self.player, -2, 2))
+
+    def testDrawIsReturned(self):
+        self.ai.all_positions = ['O','X','O','X','O','X','X','O','X']
+        self.assertEqual(0, self.ai.miniMax(self.ai, self.player, -2, 2))
+
+    def testPlayMoveThatAvoidsLoss(self):
+        self.ai.all_positions = ['X','X',0,0,'O',0,0,0,0]
+        self.assertEqual(0, self.ai.miniMax(self.ai, self.player, -2, 2))
+
+    def testPlayMovethatLeadsToWin(self):
+        self.ai.all_positions = ['X','X',0,0,'O','O']
+        self.assertEqual(1, self.ai.miniMax(self.ai, self.player, -2, 2))
+
+class testDetermine(unittest.TestCase):
+
+    def setUp(self):
+        self.ai = board_data
+        self.player = 'O'
+
+    def testFirstMoveTakeCenter(self):
+        self.ai.all_positions = [0,0,0,0,0,0,0,0,0]
+        self.assertEqual(4, determine(board_data, 'X'))
+
+    def testMakeBestMove(self):
+        self.ai.all_positions = ['X','X',0,0,'O',0,0,0,0]
+        self.assertEqual(2, determine(board_data, self.player))
+
+    def testIndexErrorRaisesWhenChoicesListIsEmpty(self):
+        self.ai.all_positions = []
+        self.failUnlessRaises(IndexError, determine, self.ai, self.player)
+
+    def testCurrentPlayerIsXGetPlayerO(self):
+        self.assertEqual('X', getEnemy(self.player))
 
 if __name__ == '__main__':
     unittest.main()
-
