@@ -2,7 +2,7 @@ import unittest, sys, os
 
 sys.path.append("..")
 
-from lib.datahandler.loadingdata import*
+from lib.loading_data.loadingdata import *
 
 class testIfImagesLoadCorrectly(unittest.TestCase):
 
