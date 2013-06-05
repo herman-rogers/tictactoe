@@ -1,14 +1,10 @@
-import os, pygame, sys
-
-sys.path.append("..")
-
-from lib.game import*
+from lib.window_settings.windowsettings import *
 
 class loadMedia(object):
 
     def loadPng(self, name):
 
-        fullname = os.path.join('data/images', name)
+        fullname = os.path.join('lib/data/images', name)
         try:
             image = pygame.image.load(fullname)
         except pygame.error:
@@ -36,13 +32,13 @@ class loadMedia(object):
         pygame.draw.rect(window_set.surface, ((0,0,0)), (left + adjx, top + adjy, window_set.box_size, window_set.box_size))
 
     def soundEffect(self):
-        sound_effect = pygame.mixer.Sound("data/sounds/soundeffect.ogg")
+        sound_effect = pygame.mixer.Sound("lib/data/sounds/soundeffect.ogg")
         sound_effect.set_volume(0.5)
         sound_effect.play()
 
     def getMusic(self):
         pygame.mixer.init()
-	pygame.mixer.music.load('data/sounds/skye.ogg')
+	pygame.mixer.music.load('lib/data/sounds/skye.ogg')
 	pygame.mixer.music.play(-1)
 
 load_data = loadMedia()

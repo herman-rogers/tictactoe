@@ -1,21 +1,17 @@
 '''This is free software created by Boomer Rogers and distributed under the GNU General Public License (2013) and is intended for non-commercial education purposes.'''
 
-import pygame, pygame.mixer, sys, os, random, time
-
-from window_settings.windowsettings import*
-from loading_data.loadingdata import*
-from minimax_AI.minimaxAI import getEnemy, determine, board_data
-from pygame.locals import*
+from lib.board_settings.boardsettings import *
+from lib.minimax_AI.minimaxAI import *
 
 class gameStart(object):
 
     def mainGame(self):
-
         pygame.init()
         pygame.display.set_caption('Tic-Tac-War')
-        mainBoard = generateNewBoard(80)
+        mainBoard = graphical_board.generateNewBoard(80)
         turn = random.choice(['computer', 'player'])
         gamestate = 1
+
 
         toggle_on = (['on'])
         music_on = load_data.loadPng('musicon.png')
@@ -57,7 +53,7 @@ class gameStart(object):
                         load_data.soundEffect()
                         spotx, spoty = pygame.mouse.get_pos()
                         if reset_yes.collidepoint((spotx, spoty)):
-                            mainBoard = generateNewBoard(80)
+                            mainBoard = graphical_board.generateNewBoard(80)
                             window_set.surface.blit(music_on, toggle_yes)
                             board_data.all_positions = [0,0,0,0,0,0,0,0,0]
 
@@ -82,7 +78,7 @@ class gameStart(object):
                             toggle_on = ['on']
                             window_set.surface.blit(music_on, toggle_yes)
 
-                        player_move = movePosition(mainBoard, board_data, player)
+                        player_move = graphical_board.movePosition(mainBoard, board_data, player)
                         if not player_move in board_data.trackMovesLeft():
                             continue
                         board_data.makeMove(player_move, player)
@@ -99,82 +95,15 @@ class gameStart(object):
                     pygame.display.update()
 
                 player = getEnemy(player)
-                computer_move = determine(board_data, player)
-                board_data.makeMove(computer_move, player)
+                makecomp_move = computer_move.determine(board_data, player)
+                board_data.makeMove(makecomp_move, player)
                 load_data.soundEffect()
                 turn = 'player'
 
             pygame.display.update()
 
-def gameExit():
-    pygame.quit()
-    exit()
-
-def movePosition(board, board_data, player):
-    '''Get Board X,Y Coordinates from player and return list move'''
-
-    posx, posy = pygame.mouse.get_pos()
-    mousex, mousey = getMouseClick(board, posx, posy)
-    get_list = zip(*[iter(enumerate(board_data.all_positions))]*3)
-    get_matrix = map(list, zip(*get_list))
-
-    try:
-        for value in get_matrix[mousex][mousey]:
-            if value in board_data.trackMovesLeft():
-                load_data.drawPlayer(mousex, mousey, 0,0)
-            return value
-    except TypeError:
-        pass
-
-def getMouseClick(board, x, y):
-    '''Converts mouse coordinates to board coordinates'''
-    for tileX in range(len(board)):
-
-        for tileY in range(len(board[0])):
-            left, top = window_set.getLeftTopCoords(tileX, tileY)
-            tileRect = pygame.Rect(left, top, window_set.box_size, window_set.box_size)
-            
-            if tileRect.collidepoint(x,y):
-                return(tileX, tileY)
-    return (None,None)
-
-def drawBoard(board): 
-    '''Draw the main game graphical board'''
-    bg = load_data.loadPng("background2.png")
-    backgroundRect = bg.get_rect()
-    window_set.surface.blit(bg, backgroundRect)
-
-    left, top = window_set.getLeftTopCoords(0,0)
-    width = window_set.board_width * window_set.box_size
-    height = window_set.board_height * window_set.box_size
-
-    for tilex in range(len(board)):    
-        for tiley in range(len(board[0])):
-            if board[tilex][tiley]:
-                load_data.drawSquare(tilex, tiley, board[tilex][tiley])
-
-def getStartBoard():
-
-    counter = 1
-    board = []
-    for x in range(window_set.board_width):
-	column = []
-	for y in range(window_set.board_height):
-	    column.append(counter)
-	    counter += window_set.board_width
-	board.append(column)
-	counter -= window_set.board_width * (window_set.board_height - 1) + window_set.board_width - 1
-    return board
-
-def generateNewBoard(self):
-    board = getStartBoard()
-    drawBoard(board)
-    pygame.display.update()
-    return (board)
+game_start = gameStart()
 
 if __name__ == '__main__':
     load_data.getMusic()
     game_start.mainGame()
-
-game_start = gameStart()
-

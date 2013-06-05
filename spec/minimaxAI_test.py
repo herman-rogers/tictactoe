@@ -2,7 +2,7 @@ import unittest, sys, os
 
 sys.path.append("..")
 
-from lib.game import*
+from lib.minimax_AI.minimaxAI import *
 
 class testBoardDataStructure(unittest.TestCase):
 
@@ -27,9 +27,6 @@ class testBoardDataStructure(unittest.TestCase):
 	board_data.makeMove(3,'O')
 	self.assertEqual(test_move, self.ai.all_positions)
 
-    def testRaiseTypeErrorMakeMove(self):
-        self.failUnlessRaises(TypeError, board_data.makeMove, None)
-
     def testMovesAreRemovedInTrackMovesLeft(self):
         moves_left = [0,1,4,5,6,7,8]
         self.assertEqual(moves_left, self.ai.trackMovesLeft())
@@ -39,6 +36,9 @@ class testBoardDataStructure(unittest.TestCase):
 
     def testReturnCorrectOPlayerPositions(self):
         self.assertEqual([3], self.ai.getPositions('O'))
+
+    def testRaiseTypeErrorMakeMove(self):
+        self.assertRaises(TypeError, self.ai.makeMove, None)
 
 class testBoardWinLoseDrawConditions(unittest.TestCase):
 
@@ -87,26 +87,27 @@ class testMiniMax(unittest.TestCase):
         self.assertEqual(0, self.ai.miniMax(self.ai, self.player, -2, 2))
 
     def testPlayMovethatLeadsToWin(self):
-        self.ai.all_positions = ['X','X',0,0,'O','O']
+        self.ai.all_positions = ['X','X',0,0,'O','O',0,0,0]
         self.assertEqual(1, self.ai.miniMax(self.ai, self.player, -2, 2))
 
 class testDetermine(unittest.TestCase):
 
     def setUp(self):
         self.ai = board_data
+        self.computermove = computer_move
         self.player = 'O'
 
     def testFirstMoveTakeCenter(self):
         self.ai.all_positions = [0,0,0,0,0,0,0,0,0]
-        self.assertEqual(4, determine(board_data, 'X'))
+        self.assertEqual(4, self.computermove.determine(self.ai, self.player))
 
     def testMakeBestMove(self):
         self.ai.all_positions = ['X','X',0,0,'O',0,0,0,0]
-        self.assertEqual(2, determine(board_data, self.player))
+        self.assertEqual(2, self.computermove.determine(self.ai, self.player))
 
-    def testIndexErrorRaisesWhenChoicesListIsEmpty(self):
+    def testReturnNoneWhenChoicesListIsEmpty(self):
         self.ai.all_positions = []
-        self.failUnlessRaises(IndexError, determine, self.ai, self.player)
+        self.assertEqual(None, self.computermove.determine(self.ai, self.player))
 
     def testCurrentPlayerIsXGetPlayerO(self):
         self.assertEqual('X', getEnemy(self.player))

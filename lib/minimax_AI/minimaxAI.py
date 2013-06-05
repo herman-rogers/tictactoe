@@ -1,9 +1,4 @@
-import random, sys, os
-from itertools import*
-
-sys.path.append("..")
-
-from lib.game import*
+from lib.loading_data.loadingdata import *
 
 class AI(object):
 
@@ -91,33 +86,37 @@ class AI(object):
 
 board_data = AI()
 
-def determine(board_data, player):
-    a = -2
-    choices = []
-    make_coords = list(product(range(3), repeat=2 ))
+class computerMove(object):
 
-    if len(board_data.trackMovesLeft()) == 9:
-	posx, posy = make_coords[4]
-	load_data.drawComputer(posy, posx, 0)
-        return 4
+    def determine(self, board_data, player):
+        a = -2
+        choices = []
+        make_coords = list(product(range(3), repeat=2 ))
 
-    for move in board_data.trackMovesLeft():
-        board_data.makeMove(move, player)
-        variable = board_data.miniMax(board_data, getEnemy(player), -2, 2)
-        board_data.makeMove(move, 0)
-        if variable > a:
-            a = variable
-            choices = [move]
-        elif variable == a:
-            choices.append(move)
+        if len(board_data.trackMovesLeft()) == 9:
+            posx, posy = make_coords[4]
+	    load_data.drawComputer(posy, posx, 0)
+            return 4
 
-    try:
-        choose_move = random.choice(choices)
-        posx,posy = make_coords[choose_move]
-        load_data.drawComputer(posy, posx, 0)
-        return choose_move
-    except IndexError:
-        pass
+        for move in board_data.trackMovesLeft():
+            board_data.makeMove(move, player)
+            variable = board_data.miniMax(board_data, getEnemy(player), -2, 2)
+            board_data.makeMove(move, 0)
+            if variable > a:
+                a = variable
+                choices = [move]
+            elif variable == a:
+                choices.append(move)
+
+        try:
+            choose_move = random.choice(choices)
+            posx,posy = make_coords[choose_move]
+            load_data.drawComputer(posy, posx, 0)
+            return choose_move
+        except IndexError:
+            pass
+
+computer_move = computerMove()
 
 def getEnemy(player):
     if player == 'X':
@@ -127,4 +126,5 @@ def getEnemy(player):
 def gameExit():
     pygame.quit()
     exit()
+
 
