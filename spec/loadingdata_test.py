@@ -11,7 +11,7 @@ class testIfImagesLoadCorrectly(unittest.TestCase):
         self.assertTrue(image)
 
     def testImageException(self):
-        self.failUnlessRaises(SystemExit, load_data.loadPng, "penguine.png")
+        self.assertRaises(SystemExit, load_data.loadPng, "penguine.png")
 
 if __name__ == "__main__":
     unittest.main()
