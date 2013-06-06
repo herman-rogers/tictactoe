@@ -5,7 +5,6 @@ class createGraphicalBoard(object):
 
     def movePosition(self, board, board_data, player):
         '''Get Board X,Y Coordinates from player and return list move'''
-
         posx, posy = pygame.mouse.get_pos()
         mousex, mousey = self.getMouseClick(board, posx, posy)
         get_list = zip(*[iter(enumerate(board_data.all_positions))]*3)
@@ -22,7 +21,6 @@ class createGraphicalBoard(object):
     def getMouseClick(self, board, x, y):
         '''Converts mouse coordinates to board coordinates'''
         for tileX in range(len(board)):
-
             for tileY in range(len(board[0])):
                 left, top = window_set.getLeftTopCoords(tileX, tileY)
                 tileRect = pygame.Rect(left, top, window_set.box_size, window_set.box_size)
@@ -47,7 +45,6 @@ class createGraphicalBoard(object):
                     load_data.drawSquare(tilex, tiley, board[tilex][tiley])
 
     def getStartBoard(self):
-
         counter = 1
         board = []
         for x in range(window_set.board_width):
