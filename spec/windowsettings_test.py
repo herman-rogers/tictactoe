@@ -25,7 +25,7 @@ class testWindowSettings(unittest.TestCase):
         self.assertEqual(self.setting.y_margin, 164)
 
     def testLeftTopCoordsValues(self):
-        position = 443,163
+        position = 443,0
         self.assertEqual(self.setting.getLeftTopCoords(0,0), position)
 
 if __name__ == "__main__":
