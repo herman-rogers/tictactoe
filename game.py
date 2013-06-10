@@ -11,9 +11,10 @@ class gameStart(object):
         pygame.init()
         pygame.display.set_caption('Tic-Tac-War')
         graphical_board.generateNewBoard(80)
-        gamestate = True
+        return self.gameLoop()
 
-        while gamestate:
+    def gameLoop(self):
+        while True:
             player = 'X'
             self.toggleMusic()
             self.endOfGame()

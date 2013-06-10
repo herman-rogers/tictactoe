@@ -46,8 +46,8 @@ class loadMedia(object):
     def exitFunction(self):
         exit_game = load_data.loadPng('exitbutton.png')
         exit_yes = exit_game.get_rect(center=(window_set.window_width/2 - 80, window_set.window_height/2 + 60))
-        exit = window_set.surface.blit(exit_game, exit_yes)
-        return exit
+        exit_init = window_set.surface.blit(exit_game, exit_yes)
+        return exit_init
 
     def computerWin(self):
         game_won = load_data.loadPng('resetcomputerwon.png')

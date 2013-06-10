@@ -5,7 +5,6 @@ sys.path.append("..")
 from lib.window_settings.windowsettings import *
 from lib.board_settings.boardsettings import *
 
-
 class testWindowSettings(unittest.TestCase):
 
     def setUp(self):

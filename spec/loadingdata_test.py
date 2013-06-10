@@ -6,8 +6,11 @@ from lib.loading_data.loadingdata import *
 
 class testIfImagesLoadCorrectly(unittest.TestCase):
 
+    def setUp(self):
+        self.data = load_data
+
     def testImageExists(self):
-        image = load_data.loadPng("computer.png")
+        image = self.data.loadPng("computer.png")
         self.assertTrue(image)
 
     def testImageException(self):
