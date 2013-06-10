@@ -12,7 +12,6 @@ class gameStart(object):
         pygame.display.set_caption('Tic-Tac-War')
         graphical_board.generateNewBoard(80)
         gamestate = True
-        clock = pygame.time.Clock() 
 
         while gamestate:
             player = 'X'
@@ -20,7 +19,7 @@ class gameStart(object):
             self.endOfGame()
             self.playerMakeMove(player)
             pygame.display.update()
-            clock.tick(30)
+            window_set.clock.tick(30)
 
     def playerMakeMove(self, player):
         for event in pygame.event.get():

@@ -29,5 +29,9 @@ class testGraphicalSettingsStructure(unittest.TestCase):
         tuples_returned = [(None,None),(0,0),(0,1),(0,2),(1,0),(1,1),(1,2),(2,0),(2,1),(2,2)]
         self.assertIn(self.get_board.getMouseClick(), tuples_returned)
 
+
+    def testDrawBoard(self):
+        self.assertEqual(self.get_board.drawBoard(), 4)
+
 if __name__ == '__main__':
     unittest.main()
