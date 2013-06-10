@@ -2,5 +2,5 @@ venv
 *.game
 *.swp
 *.swo
-*~w
+*~
 *.pyc
