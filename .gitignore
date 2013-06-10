@@ -1,6 +1,6 @@
 venv
 *.game
 *.swp
-*.game.py.swn
-*.game.py.swo
+*.swo
+*~w
 *.pyc
