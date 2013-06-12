@@ -33,6 +33,10 @@ class gamePlayerInput(object):
 
             elif event.type == MOUSEBUTTONUP:
                 load_data.soundEffect()
+                userInputMusic().toggle()
+                player_move = graphical_board.movePosition()
+                if not player_move in board_data.trackMovesLeft():
+                    continue
                 gamePlayerMove().move(player)
 
             elif event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -42,8 +46,6 @@ class gamePlayerMove(object):
 
     def move(self, player):
         player_move = graphical_board.movePosition()
-#        if not player_move in board_data.trackMovesLeft():
-            #continue
         board_data.makeMove(player_move, player)
         return gameComputerMove().computerMakeMove(player)
 
