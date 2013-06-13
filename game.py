@@ -4,6 +4,8 @@
 
 from lib.board_settings.boardsettings import *
 from lib.minimax_AI.minimaxAI import *
+from lib.player_move.playermove import *
+
 
 class gameStart(object):
 
@@ -23,54 +25,6 @@ class gameMainLoop(object):
             gamePlayerInput().playerMakeMove(player)
             gameCheckConditions().checkBoard()
 
-class gameCheckConditions(object):
-
-    def checkBoard(self):
-        gameEnd().endOfGame()
-        pygame.display.update()
-        window_set.clock.tick(30)
-
-class gamePlayerInput(object):
-
-    def playerMakeMove(self, player):
-        for event in pygame.event.get():
-            if board_data.boardComplete() == True and event.type == MOUSEBUTTONUP:
-                load_data.soundEffect()
-
-                if load_data.resetFunction().collidepoint(graphical_board.mouseCoords()):
-                    gameReset().dataReset()
-
-                elif load_data.exitFunction().collidepoint(graphical_board.mouseCoords()):
-                    gameExit()
-
-            elif event.type == MOUSEBUTTONUP:
-                load_data.soundEffect()
-
-                if gameToggleMusic().toggleMusic().collidepoint(graphical_board.mouseCoords()) and pygame.mixer.music.get_busy() == 0:
-                    return load_data.getMusic()
-
-		if gameToggleMusic().toggleMusic().collidepoint(graphical_board.mouseCoords()) and pygame.mixer.get_busy():
-		    pygame.mixer.music.stop()
-
-                player_move = graphical_board.movePosition()
-                if not player_move in board_data.trackMovesLeft():
-                    continue
-                board_data.makeMove(player_move, player)
-                return gameComputerMove().computerMakeMove(player)
-
-            elif event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                gameExit()
-
-class gameEnd(object):
-    def endOfGame(self):
-        if board_data.boardComplete():
-            if board_data.winner() == 'O':
-                load_data.computerWin()
-                    
-            if board_data.winner() == None:
-                load_data.displayDraw()
-            return load_data.resetFunction() and load_data.exitFunction()
-
 class gameComputerMove(object):
 
     def computerMakeMove(self, player):
@@ -82,17 +36,23 @@ class gameComputerMove(object):
         load_data.soundEffect()
         return gamePlayerInput().playerMakeMove(player)
 
-class gameToggleMusic(object):
+class gameCheckConditions(object):
 
-    def toggleMusic(self):
-	music_on, music_off = load_data.loadPng('musicon.png'), load_data.loadPng('musicoff.png')
-	toggle = music_on.get_rect()
+    def checkBoard(self):
+        gameEnd().endOfGame()
+        pygame.display.update()
+        window_set.clock.tick(30)
 
-        if pygame.mixer.music.get_busy():
-            music = window_set.surface.blit(music_on, toggle)
-        if not pygame.mixer.music.get_busy():
-            music = window_set.surface.blit(music_off, toggle)
-        return music
+class gameEnd(object):
+
+    def endOfGame(self):
+        if board_data.boardComplete():
+            if board_data.winner() == 'O':
+                load_data.computerWin()
+                    
+            if board_data.winner() == None:
+                load_data.displayDraw()
+            return load_data.resetFunction() and load_data.exitFunction()
 
 class gameReset(object):
 
