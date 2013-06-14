@@ -49,13 +49,13 @@ class loadMedia(object):
         exit_init = window_set.surface.blit(exit_game, exit_yes)
         return exit_init
 
-    def computerWin(self):
+    def displayWinImage(self):
         game_won = load_data.loadPng('resetcomputerwon.png')
         display_reset = game_won.get_rect(center=(window_set.window_width/2, window_set.window_height/2))
         computer_win_yes = window_set.surface.blit(game_won, display_reset)
         return computer_win_yes
 
-    def displayDraw(self):
+    def displayDrawImage(self):
         draw_game = load_data.loadPng('drawbox.png')
         display_reset = draw_game.get_rect(center=(window_set.window_width/2, window_set.window_height/2))
         draw_yes = window_set.surface.blit(draw_game, display_reset)

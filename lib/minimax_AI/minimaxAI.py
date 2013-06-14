@@ -126,5 +126,3 @@ def getEnemy(player):
 def gameExit():
     pygame.quit()
     exit()
-
-

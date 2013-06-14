@@ -6,6 +6,8 @@ from lib.board_settings.boardsettings import *
 class gamePlayerInput(object):
 
     def playerMakeMove(self, player):
+
+        gameToggleMusic().toggleMusic()
         for event in pygame.event.get():
 
             if board_data.boardComplete() == True and event.type == MOUSEBUTTONUP:
