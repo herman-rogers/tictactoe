@@ -6,7 +6,6 @@ from lib.board_settings.boardsettings import *
 from lib.minimax_AI.minimaxAI import *
 from lib.player_move.playermove import *
 
-
 class gameStart(object):
 
     pygame.init()
@@ -24,17 +23,6 @@ class gameMainLoop(object):
             gameToggleMusic().toggleMusic()
             gamePlayerInput().playerMakeMove(player)
             gameCheckConditions().checkBoard()
-
-class gameComputerMove(object):
-
-    def computerMakeMove(self, player):
-        pygame.display.update()
-        player = getEnemy(player)
-        makecomp_move = computer_move.determine(board_data, player)
-        time.sleep(0.7)
-        board_data.makeMove(makecomp_move, player)
-        load_data.soundEffect()
-        return gamePlayerInput().playerMakeMove(player)
 
 class gameCheckConditions(object):
 
