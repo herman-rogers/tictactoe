@@ -1,7 +1,6 @@
 import unittest, sys, os
 
 sys.path.append("..")
-
 from lib.minimax_AI.minimaxAI import *
 
 class testBoardDataStructure(unittest.TestCase):
