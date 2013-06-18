@@ -18,12 +18,12 @@ class testBoardDataStructure(unittest.TestCase):
 
     def testMakeMovePlayer1(self):
 	test_move = [0,0,'X',0,0,0,0,0,0]
-	board_data.makeMove(2,'X')
+	self.ai.makeMove(2,'X')
 	self.assertEqual(test_move, self.ai.all_positions)
 
     def testMakeMovePlayer2(self):
 	test_move = [0,0,'X','O',0,0,0,0,0]
-	board_data.makeMove(3,'O')
+	self.ai.makeMove(3,'O')
 	self.assertEqual(test_move, self.ai.all_positions)
 
     def testMovesAreRemovedInTrackMovesLeft(self):
