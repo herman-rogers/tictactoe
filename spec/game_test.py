@@ -21,8 +21,7 @@ class testMainGameWhileLoop(unittest.TestCase):
     @patch('lib.board_settings.boardsettings.loadMedia.resetFunction')
     def testResetButtonShowsInTheDialogAtEndOfGame(self, mock_reset_button):
         for move in self.moves_left:
-            x = 'X'
-            self.data.makeMove(move,x)
+            self.data.makeMove(move, 'X')
         gameEnd().endOfGame()
         self.assertTrue(mock_reset_button.called)
 
@@ -34,8 +33,7 @@ class testMainGameWhileLoop(unittest.TestCase):
     @patch('lib.loading_data.loadingdata.loadMedia.displayDrawImage')
     def testDrawGameDialogIsDisplayed(self, mock_reset_dialog):
         for move in self.moves_left:
-            x = 'X'
-            self.data.makeMove(move,x)
+            self.data.makeMove(move,'X')
 	get_game_reset = gameEnd()
 	get_game_reset.endOfGame()
 	self.assertTrue(mock_reset_dialog.called)
@@ -44,8 +42,7 @@ class testMainGameWhileLoop(unittest.TestCase):
     def testEndOfGameComputerWinReturnsCorrectScreen(self, mock_win):
         self.moves_left = [0,1,2,3,4,5,6,7,8]
         for move in self.moves_left:
-            y = 'O'
-            self.data.makeMove(move,y)
+            self.data.makeMove(move, 'O')
         get_game_win = gameEnd()
         get_game_win.endOfGame()
         self.assertTrue(mock_win.called)
