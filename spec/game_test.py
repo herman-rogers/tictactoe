@@ -7,39 +7,59 @@ from game import *
 
 class testMainGameWhileLoop(unittest.TestCase):
 
+    def setUp(self):
+        pygame.mixer.init()
+        self.data = board_data
+        self.moves_left = self.data.trackMovesLeft()
+
     @patch('lib.board_settings.boardsettings.createGraphicalBoard.generateNewBoard')
     def testGameFunctionInitReturnsNewBoardAtStart(self, mock_start_board):
         get_start_board = gameFunction()
         get_start_board.__init__()
         self.assertTrue(mock_start_board.called)
 
-#    @patch('lib.player_move.playermove.gamePlayerInput.playerMakeMove')
-    #def testGameFunctionMainLoopReturnsPlayerMoveAtStart(self, mock_player_turn):
-        #get_player_move = gameFunction()
-        #get_player_move.mainLoop()
-        #self.assertTrue(mock_player_turn.called)
-
-class testEndOfGameAndResetPrompts(unittest.TestCase):
-
-    def setUp(self):
-        board_data.all_positions = [0]
-
-    @patch('lib.loading_data.loadingdata.loadMedia.resetFunction')
-    def testResetButtonShowsAtEndOfGame(self, mock_reset_button):
-        reset_button = gameEnd()
-        reset_button.endOfGame()
+    @patch('lib.board_settings.boardsettings.loadMedia.resetFunction')
+    def testResetButtonShowsInTheDialogAtEndOfGame(self, mock_reset_button):
+        for move in self.moves_left:
+            x = 'X'
+            self.data.makeMove(move,x)
+        gameEnd().endOfGame()
         self.assertTrue(mock_reset_button.called)
-        restore()
+
+    @patch('lib.board_settings.boardsettings.loadMedia.resetFunction')        
+    def testExitButtonShowsInTheDialogAtEndOfGame(self, mock_exit_button):
+        gameEnd().endOfGame()
+        self.assertTrue(mock_exit_button.called)
+
+    @patch('lib.loading_data.loadingdata.loadMedia.displayDrawImage')
+    def testDrawGameDialogIsDisplayed(self, mock_reset_dialog):
+        for move in self.moves_left:
+            x = 'X'
+            self.data.makeMove(move,x)
+	get_game_reset = gameEnd()
+	get_game_reset.endOfGame()
+	self.assertTrue(mock_reset_dialog.called)
+
+    @patch('lib.loading_data.loadingdata.loadMedia.displayWinImage')
+    def testEndOfGameComputerWinReturnsCorrectScreen(self, mock_win):
+        self.moves_left = [0,1,2,3,4,5,6,7,8]
+        for move in self.moves_left:
+            y = 'O'
+            self.data.makeMove(move,y)
+        get_game_win = gameEnd()
+        get_game_win.endOfGame()
+        self.assertTrue(mock_win.called)
 
     @patch('lib.board_settings.boardsettings.createGraphicalBoard.generateNewBoard')
-    def testGameReturnsNewBoardAfterEndGame(self, mock_end_board):
+    def testGameReturnsNewBoardAfterGameEnds(self, mock_end_board):
         get_reset_board = gameReset()
         get_reset_board.dataReset()
         self.assertTrue(mock_end_board.called)
 
-   # @patch() THIS IS SAVED TO TEST DATARESET BOARD ALL_POSITIONS
-
-
+    def testGameReturnEmptrDataStuctureAfterGameEnds(self):
+        gameReset().dataReset()
+        empty_structure = [0,0,0,0,0,0,0,0,0]
+        self.assertEqual(self.data.all_positions, empty_structure)
 
 if __name__ == '__main__':
     unittest.main()
